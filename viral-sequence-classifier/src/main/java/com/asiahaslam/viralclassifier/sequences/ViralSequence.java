@@ -18,6 +18,12 @@ public class ViralSequence {
         this.virusFamily = null;
     }
 
+    public ViralSequence() {
+        this.name = null;
+        this.sequence = null;
+        this.virusFamily = null;
+    }
+
     // getters
     public String getSequence() {
         return sequence;
