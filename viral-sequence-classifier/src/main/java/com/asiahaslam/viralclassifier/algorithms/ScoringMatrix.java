@@ -49,4 +49,19 @@ public class ScoringMatrix {
         // return mismatch score if nucleotides do not match
         else return mismatchScore;
     }
+
+    // getter for gap penalty (used for insertions and deletions)
+    public int getGapPenalty() {
+        return gapPenalty;
+    }
+
+    // getter for match score
+    public int getMatchScore() {
+        return matchScore;
+    }
+
+    // getter for mismatch score
+    public int getMismatchScore() {
+        return mismatchScore;
+    }
 }
