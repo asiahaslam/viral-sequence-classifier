@@ -1,11 +1,18 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
+/**
+    * the ScoringMatrix class uses scoring parameters to classify alignment between sequences
+    * this is the foundation of the Smith-Waterman algorithm
+    * it includes functions for getting the alignment score, maximum possible score, and gap penalty
+ */
+
+
 public class ScoringMatrix {
     private int matchScore;
     private int mismatchScore;
     private int gapPenalty;
 
-    // this default constructor sets scoring parameters that work well for DNA sequences
+    // this default constructor sets scoring parameters that tend to work well for DNA sequences
     public ScoringMatrix() {
         this.matchScore = 2;
         this.mismatchScore = -1;
@@ -19,7 +26,11 @@ public class ScoringMatrix {
         this.gapPenalty = gap;
     }
 
-    // checks if a DNA nucleotide is valid
+    /**
+     * checks if a DNA nucleotide is valid
+     * @param nucleotide character to check
+     * @return true if valid nucleotide or valid unknown (A, G, T, C, or N)
+     */
     private boolean isValidNucleotide(char nucleotide) {
         return switch (nucleotide) {
             case 'A', 'G', 'T', 'C', 'N' -> true;
@@ -27,7 +38,12 @@ public class ScoringMatrix {
         };
     }
 
-    // get the alignment score for a nucleotide pair
+    /**
+     * get the alignment score for a nucleotide pair
+     * @param nuc1 first nucleotide
+     * @param nuc2 second nucleotide
+     * @return score for this pair of nucleotides
+     */
     public int getScore(char nuc1, char nuc2) {
         // normalize to uppercase
         nuc1 = Character.toUpperCase(nuc1);
@@ -50,7 +66,12 @@ public class ScoringMatrix {
         else return mismatchScore;
     }
 
-    // get the maximum possible score that would occur if 2 sequences are perfectly aligned
+    /**
+     * get the maximum possible score that would occur if 2 sequences are perfectly aligned
+     * @param sequence1 first sequence
+     * @param sequence2 second sequence
+     * @return maximum possible alignment score between the 2 sequences
+     */
     public int getMaxPossibleScore(String sequence1, String sequence2) {
         int minLength = Math.min(sequence1.length(), sequence2.length());
         return minLength * matchScore;
