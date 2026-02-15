@@ -18,4 +18,35 @@ public class ScoringMatrix {
         this.mismatchScore = mismatch;
         this.gapPenalty = gap;
     }
+
+    // checks if a DNA nucleotide is valid
+    private boolean isValidNucleotide(char nucleotide) {
+        return switch (nucleotide) {
+            case 'A', 'G', 'T', 'C', 'N' -> true;
+            default -> false;
+        };
+    }
+
+    // get the alignment score for a nucleotide pair
+    public int getScore(char nuc1, char nuc2) {
+        // normalize to uppercase
+        nuc1 = Character.toUpperCase(nuc1);
+        nuc2 = Character.toUpperCase(nuc2);
+
+        // if either nucleotide is unknown, treat as a mismatch
+        if (nuc1 == 'N' || nuc2 == 'N') return mismatchScore;
+
+        // make sure nucleotides are valid
+        if (isValidNucleotide(nuc1) || isValidNucleotide((nuc2))) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid nucleotide pair: '%c' and '%c'", nuc1, nuc2)
+            );
+        }
+
+        // return match score if nucleotides match
+        if (nuc1 == nuc2) return matchScore;
+
+        // return mismatch score if nucleotides do not match
+        else return mismatchScore;
+    }
 }
