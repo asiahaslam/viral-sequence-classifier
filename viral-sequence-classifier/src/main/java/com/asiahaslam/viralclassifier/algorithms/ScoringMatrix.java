@@ -50,6 +50,12 @@ public class ScoringMatrix {
         else return mismatchScore;
     }
 
+    // get the maximum possible score that would occur if 2 sequences are perfectly aligned
+    public int getMaxPossibleScore(String sequence1, String sequence2) {
+        int minLength = Math.min(sequence1.length(), sequence2.length());
+        return minLength * matchScore;
+    }
+
     // getter for gap penalty (used for insertions and deletions)
     public int getGapPenalty() {
         return gapPenalty;
