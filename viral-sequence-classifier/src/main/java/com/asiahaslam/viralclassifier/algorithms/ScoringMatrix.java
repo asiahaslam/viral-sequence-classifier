@@ -20,10 +20,14 @@ public class ScoringMatrix {
     }
 
     // this constructor allows for custom scoring parameters
+    // match must always be positive and mismatch and gap must always be negative
     public ScoringMatrix(int match, int mismatch, int gap) {
-        this.matchScore = match;
-        this.mismatchScore = mismatch;
-        this.gapPenalty = gap;
+        if (match > 0) this.matchScore = match;
+        else this.matchScore = 2;
+        if (mismatch < 0) this.mismatchScore = mismatch;
+        else this.mismatchScore = -1;
+        if (gap < 0) this.gapPenalty = gap;
+        else this.gapPenalty = -1;
     }
 
     /**
