@@ -57,7 +57,7 @@ public class ScoringMatrix {
         if (nuc1 == 'N' || nuc2 == 'N') return mismatchScore;
 
         // make sure nucleotides are valid
-        if (isValidNucleotide(nuc1) || isValidNucleotide((nuc2))) {
+        if (!isValidNucleotide(nuc1) || !isValidNucleotide((nuc2))) {
             throw new IllegalArgumentException(
                     String.format("Invalid nucleotide pair: '%c' and '%c'", nuc1, nuc2)
             );
