@@ -33,6 +33,7 @@ public class SmithWatermanAligner {
         double[][] scoreMatrix = createScoringMatrix(sequence1, sequence2);
 
         // find position of max score
+        MaxScorePosition maxPos = findMaxScore(scoreMatrix);
 
         // calculate normalized score
 
@@ -67,10 +68,28 @@ public class SmithWatermanAligner {
                 double insert = matrix[i][j - 1] + scoringMatrix.getGapPenalty();
 
                 // take maximum of the 3 operations above or 0 if they are all negative
+                // this is the value for the current index in the matrix
                 matrix[i][j] = Math.max(0, Math.max(match, Math.max(delete, insert)));
             }
         }
         return matrix;
+    }
+
+    private MaxScorePosition findMaxScore(double[][] matrix) {
+        double maxScore = 0;
+        int maxI = 0;
+        int maxJ = 0;
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] > maxScore) {
+                    maxScore = matrix[i][j];
+                    maxI = i;
+                    maxJ = j;
+                }
+            }
+        }
+        return new MaxScorePosition(maxScore, maxI, maxJ);
     }
 
     // helper class to store position and max value in matrix
