@@ -8,9 +8,9 @@ package com.asiahaslam.viralclassifier.algorithms;
 
 
 public class ScoringMatrix {
-    private int matchScore;
-    private int mismatchScore;
-    private int gapPenalty;
+    private final int matchScore;
+    private final int mismatchScore;
+    private final int gapPenalty;
 
     // this default constructor sets scoring parameters that tend to work well for DNA sequences
     public ScoringMatrix() {
