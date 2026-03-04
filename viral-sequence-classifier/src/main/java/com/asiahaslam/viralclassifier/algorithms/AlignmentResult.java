@@ -31,6 +31,11 @@ public class AlignmentResult {
         this(alignmentScr, normalizedScr, "", "", 0, 0, 0, 0);
     }
 
+    //
+    public String getFormattedAlignment() {
+        return String.format("Score: %.2f (normalized: %.3f)", alignmentScore, normalizedScore);
+    }
+
     // getters
     public double getAlignmentScore() { return alignmentScore; }
     public double getNormalizedScore() { return normalizedScore; }

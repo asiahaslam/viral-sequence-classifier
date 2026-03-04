@@ -5,7 +5,6 @@ package com.asiahaslam.viralclassifier.algorithms;
  * to implement the Smith-Waterman local sequence alignment algorithm.
  * This algorithm helps us find the best possible alignment between the sequences
  * where there are the highest number of matches between the nucleotides.
- *
  * First, we create a Smith-Waterman scoring matrix from the 2 DNA sequences.
  * This uses the scoring matrix class to find the match score between each possible pair of nucleotides.
  * Next, we find the max score in the matrix and its position.
@@ -139,7 +138,7 @@ public class SmithWatermanAligner {
         int endPos1 = i - 1;
         int endPos2 = j - 1;
 
-        // trace back through matrix until we reach either the edge of the matrix or a a cell with score 0
+        // trace back through matrix until we reach either the edge of the matrix or a cell with score 0
         while (i > 0 && j > 0 && matrix[i][j] > 0) {
             // find nucleotides associated with the current matrix cell
             char char1 = seq1.charAt(i - 1);
@@ -157,7 +156,7 @@ public class SmithWatermanAligner {
             // find which operation led to the current cell
             if (Math.abs(currentScore - diagonalScore) < 1e-9) {
                 // it was a match or mismatch
-                // no need to chage the position of either nucleotide in the sequence
+                // no need to change the position of either nucleotide in the sequence
                 alignedSeq1.insert(0, char1);
                 alignedSeq2.insert(0, char2);
                 i--;
