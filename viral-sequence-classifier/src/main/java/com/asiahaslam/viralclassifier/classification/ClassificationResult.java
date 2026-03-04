@@ -34,7 +34,7 @@ public class ClassificationResult {
     }
 
     // simple constructor for classifications that are uncertain
-    public ClassificationResult createUnknown(String sequenceId, Map<String, Double> allFamilyScores,
+    public static ClassificationResult createUnknown(String sequenceId, Map<String, Double> allFamilyScores,
                                               String algorithmUsed, long processingTimeMs) {
         return new ClassificationResult(sequenceId, "Unknown", 0.0, false,
                 allFamilyScores, algorithmUsed, processingTimeMs);
