@@ -7,8 +7,7 @@ import com.asiahaslam.viralclassifier.sequences.FastaParser;
 import com.asiahaslam.viralclassifier.algorithms.ScoringMatrix;
 
 public class ViralClassifierApp {
-    static void main(String[] args) {
-        // TEST 1: test FASTA parsing
+    static void testFastaParser() {
         try {
             // parse a FASTA file
             ViralSequence sequence = FastaParser.parseFile("data/influenza_b.fasta");
@@ -18,8 +17,9 @@ public class ViralClassifierApp {
         catch (Exception e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
+    }
 
-        // TEST 2: test scoring
+    static void testScoring() {
         // scoring matrix
         ScoringMatrix matrix = new ScoringMatrix();
 
@@ -36,8 +36,9 @@ public class ViralClassifierApp {
         // max possible score
         System.out.println("Max possible score for ATCG and ATCGAA: " +
                 matrix.getMaxPossibleScore("ATCG", "ATCGAA"));
+    }
 
-        // TEST 3: test smith-waterman aligner
+    static void testSWAligner() {
         SmithWatermanAligner aligner = new SmithWatermanAligner();
 
         // perfect match
@@ -59,5 +60,23 @@ public class ViralClassifierApp {
         AlignmentResult result4 = aligner.align("AAAA", "TTTT");
         System.out.println("No similarity test: ");
         System.out.println(result4.getFormattedAlignment());
+    }
+
+    static void testClassificationResult() {
+
+    }
+
+    static void main(String[] args) {
+        // TEST 1: test FASTA parsing
+        testFastaParser();
+
+        // TEST 2: test scoring
+        testScoring();
+
+        // TEST 3: test smith-waterman aligner
+        testSWAligner();
+
+        // TEST 4: test alignment result class
+        testClassificationResult();
     }
 }
