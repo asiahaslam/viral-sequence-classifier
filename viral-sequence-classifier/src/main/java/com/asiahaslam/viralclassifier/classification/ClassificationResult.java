@@ -1,6 +1,7 @@
 package com.asiahaslam.viralclassifier.classification;
 
 import java.util.Map;
+import java.util.HashMap;
 
 public class ClassificationResult {
     private final String sequenceId;
@@ -37,6 +38,14 @@ public class ClassificationResult {
                                               String algorithmUsed, long processingTimeMs) {
         return new ClassificationResult(sequenceId, "Unknown", 0.0, false,
                 allFamilyScores, algorithmUsed, processingTimeMs);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "ClassificationResult{id='%s', predicted='%s', confidence = %.3f, confident=%s, time=%dms",
+                sequenceId, predictedFamily, confidence, isPredictionConfident, processingTimeMs
+        );
     }
 }
 
