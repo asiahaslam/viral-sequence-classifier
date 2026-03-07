@@ -56,7 +56,8 @@ public class ViralClassifier {
                     );
         }
 
-        // TODO: calculate alignment scores against each virus family
+        // calculate alignment scores against each virus family
+        Map<String, Double> familyScores = calculateFamilyScores(unknownSequence);
 
         // TODO: determine best classification
 
@@ -71,10 +72,45 @@ public class ViralClassifier {
             String familyName = familyEntry.getKey();
             List<ViralSequence> references = familyEntry.getValue();
 
-            // TODO: calculate the best score for the family
+            double bestScore = calculateBestScoreForFamily(unknownSequence, references);
+            familyScores.put(familyName, bestScore);
 
         }
         return familyScores;
+    }
+
+    private double calculateBestScoreForFamily(ViralSequence unknownSequence,
+                                               List<ViralSequence> referenceSequences) {
+        // variable to hold the current best score in the family
+        double bestScore = 0.0;
+        // find the number of sequences to check: either all sequences or the set limit, whichever is smaller
+        int sequencesToCheck = Math.min(referenceSequences.size(), maxReferencesPerFamily);
+
+        // sort references by length because a longer sequence is likely to have better alignment
+        List<ViralSequence> sortedReferences = new ArrayList<>(referenceSequences);
+        sortedReferences.sort((a, b) -> Integer.compare(b.getLength(), a.getLength()));
+
+        // now go through the sequences to find the best match
+        for (int i = 0; i < sequencesToCheck; i++) {
+            ViralSequence reference = sortedReferences.get(i);
+
+            try {
+                // try to align the unknown sequence with the current sequence to compare in this family
+                AlignmentResult result = aligner.align(
+                        unknownSequence.getSequence(),
+                        reference.getSequence()
+                );
+
+                double normalizedScore = result.getNormalizedScore();
+                bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
+            }
+
+            catch (Exception e) {
+                // log error but continue aligning other references
+                System.err.println("Error aligning with reference" + reference.getName() + " : " + e.getMessage());
+            }
+        }
+        return bestScore;
     }
 
     // getters
