@@ -3,9 +3,6 @@ package com.asiahaslam.viralclassifier.sequences;
 import java.io.*;
 
 // initial basic logic from https://rosettacode.org/wiki/FASTA_format
-// TODO: add logic for dealing with different kinds of formatting in files
-// TODO: instead of printing to console, create string objects from parsed FASTA files
-// TODO: add virus family to the new ViralSequence object if provided?
 
 public class FastaParser {
     public static ViralSequence parseFile(String filePath) throws IOException {
