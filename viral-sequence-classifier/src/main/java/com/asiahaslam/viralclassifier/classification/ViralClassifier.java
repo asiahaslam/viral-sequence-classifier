@@ -63,7 +63,21 @@ public class ViralClassifier {
         String bestFamily = findBestFamily(familyScores);
         double bestScore = familyScores.getOrDefault(bestFamily, 0.0);
 
-        // TODO: check if prediction meets confidence threshold
+        // check if prediction meets confidence threshold
+        boolean isConfident = bestScore >= confidenceThreshold;
+        String finalPrediction = isConfident ? bestFamily : "Unknown";
+
+        long processingTime = System.currentTimeMillis() - startTime;
+
+        return new ClassificationResult(
+                unknownSequence.getName(),
+                finalPrediction,
+                bestScore,
+                isConfident,
+                familyScores,
+                "Smith-Waterman",
+                processingTime
+        );
     }
 
     // calculate alignment scores for each virus family
