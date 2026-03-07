@@ -8,8 +8,6 @@ import com.asiahaslam.viralclassifier.sequences.ViralSequence;
 import com.asiahaslam.viralclassifier.sequences.FastaParser;
 import com.asiahaslam.viralclassifier.algorithms.ScoringMatrix;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.*;
 
 public class ViralClassifierApp {
