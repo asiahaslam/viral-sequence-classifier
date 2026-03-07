@@ -59,12 +59,20 @@ public class ViralClassifier {
         // calculate alignment scores against each virus family
         Map<String, Double> familyScores = calculateFamilyScores(unknownSequence);
 
-        // TODO: determine best classification
+        // determine best classification
+        String bestFamily = findBestFamily(familyScores);
+        double bestScore = familyScores.getOrDefault(bestFamily, 0.0);
 
         // TODO: check if prediction meets confidence threshold
     }
 
     // calculate alignment scores for each virus family
+
+    /**
+     * calculate alignment scores for each virus family
+     * @param unknownSequence the unclassified sequence
+     * @return Map<String, Double> familyScores the map of alignment scores for each sequence in the family
+     */
     private Map<String, Double> calculateFamilyScores(ViralSequence unknownSequence) {
         Map<String, Double> familyScores = new HashMap<>();
 
@@ -79,6 +87,12 @@ public class ViralClassifier {
         return familyScores;
     }
 
+    /**
+     * find the highest alignment score for the unclassified sequence and the sequences in a viral family
+     * @param unknownSequence the unclassified sequence
+     * @param referenceSequences the sequences in a certain viral family
+     * @return double the best normalized score for a virus family
+     */
     private double calculateBestScoreForFamily(ViralSequence unknownSequence,
                                                List<ViralSequence> referenceSequences) {
         // variable to hold the current best score in the family
@@ -111,6 +125,15 @@ public class ViralClassifier {
             }
         }
         return bestScore;
+    }
+
+    // find virus family with the highest score
+    private String findBestFamily(Map<String, Double> familyScores) {
+        return familyScores.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("Unknown");
     }
 
     // getters
