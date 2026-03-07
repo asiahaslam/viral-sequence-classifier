@@ -37,16 +37,44 @@ public class ViralClassifier {
         this.maxReferencesPerFamily = maxReferencesPerFamily;
     }
 
+    /**
+     * classify a single viral sequence
+     * @param unknownSequence the sequence to be classified
+     * @return ClassificationResult with prediction and confidence scores
+     */
     public ClassificationResult classify(ViralSequence unknownSequence) {
         long startTime = System.currentTimeMillis(); // for calculating processing time
 
         // validate input
+        // if no sequence, use createUnknown to create an unknown viral sequence
+        if (unknownSequence == null || unknownSequence.getSequence().isEmpty()) {
+            return ClassificationResult.createUnknown(
+                    unknownSequence != null ? unknownSequence.getName() : "null",
+                    new HashMap<>(),
+                    "Smith-Waterman",
+                    System.currentTimeMillis() - startTime
+                    );
+        }
 
-        // calculate alignment scores against each virus family
+        // TODO: calculate alignment scores against each virus family
 
-        // determine best classification
+        // TODO: determine best classification
 
-        // check if prediction meets confidence threshold
+        // TODO: check if prediction meets confidence threshold
+    }
+
+    // calculate alignment scores for each virus family
+    private Map<String, Double> calculateFamilyScores(ViralSequence unknownSequence) {
+        Map<String, Double> familyScores = new HashMap<>();
+
+        for (Map.Entry<String, List<ViralSequence>> familyEntry : referenceDatabase.entrySet()) {
+            String familyName = familyEntry.getKey();
+            List<ViralSequence> references = familyEntry.getValue();
+
+            // TODO: calculate the best score for the family
+
+        }
+        return familyScores;
     }
 
     // getters
