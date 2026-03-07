@@ -36,6 +36,24 @@ public class ViralClassifier {
         this.confidenceThreshold = confidenceThreshold;
         this.maxReferencesPerFamily = maxReferencesPerFamily;
     }
+
+    public ClassificationResult classify(ViralSequence unknownSequence) {
+        long startTime = System.currentTimeMillis(); // for calculating processing time
+
+        // validate input
+
+        // calculate alignment scores against each virus family
+
+        // determine best classification
+
+        // check if prediction meets confidence threshold
+    }
+
+    // getters
+    public double getConfidenceThreshold() { return confidenceThreshold; }
+    public int getMaxReferencesPerFamily() { return maxReferencesPerFamily; }
+    public SmithWatermanAligner getAligner() { return aligner; }
+
 }
 
 
