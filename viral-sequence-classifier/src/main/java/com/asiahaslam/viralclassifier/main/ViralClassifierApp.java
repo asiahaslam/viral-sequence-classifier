@@ -3,12 +3,14 @@ package com.asiahaslam.viralclassifier.main;
 import com.asiahaslam.viralclassifier.algorithms.AlignmentResult;
 import com.asiahaslam.viralclassifier.algorithms.SmithWatermanAligner;
 import com.asiahaslam.viralclassifier.classification.ClassificationResult;
+import com.asiahaslam.viralclassifier.classification.ViralClassifier;
 import com.asiahaslam.viralclassifier.sequences.ViralSequence;
 import com.asiahaslam.viralclassifier.sequences.FastaParser;
 import com.asiahaslam.viralclassifier.algorithms.ScoringMatrix;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.*;
 
 public class ViralClassifierApp {
     static void testFastaParser() {
@@ -96,8 +98,41 @@ public class ViralClassifierApp {
         System.out.println("Unknown result: \n" + unknown);
     }
 
+    static void testViralClassifier() {
+        System.out.println("Testing viral sequence classifier:\n");
+
+        // create a mock database of reference sequences
+        Map<String, List<ViralSequence>> database = new HashMap<>();
+
+        // add some sample reference sequences to the database
+        List<ViralSequence> influenzaRefs = Arrays.asList(
+                new ViralSequence("flu_1", "ATCGATCGATCGATCGATCG", "Influenza"),
+                new ViralSequence("flu_2", "ATCGATCGATCGATCGATCC", "Influenza")
+        );
+
+        List<ViralSequence> coronaRefs = Arrays.asList(
+                new ViralSequence("corona_1", "GGCCGGCCGGCCGGCCGGCC", "Coronavirus"),
+                new ViralSequence("corona_2", "GGCCGGCCGGCCGGCCGGCA", "Coronavirus")
+        );
+
+        database.put("Influenza", influenzaRefs);
+        database.put("Coronavirus", coronaRefs);
+
+        // create classifier instance
+        ViralClassifier classifier = new ViralClassifier(database);
+
+        // test classification
+        ViralSequence testSeq1 = new ViralSequence("test1", "ATCGATCGATCGATTT", "Unknown");
+        ViralSequence testSeq2 = new ViralSequence("test2", "GGCCGGCCGGCCGGCCGGCC", "Unknown");
+        ViralSequence testSeq3 = new ViralSequence("test3", "TTTTTTTTTTTTTTTTTTTTT", "Unknown");
+
+        System.out.println("Test 1 (influenza-like): " + classifier.classify(testSeq1));
+        System.out.println("Test 2 (corona-like): " + classifier.classify(testSeq2));
+        System.out.println("Test 3 (unknown): " + classifier.classify(testSeq3));
+    }
+
     static void main(String[] args) {
-        // TEST 1: test FASTA parsing
+        // TEST 1: test FASTA file parsing
         testFastaParser();
 
         // TEST 2: test scoring
@@ -106,7 +141,10 @@ public class ViralClassifierApp {
         // TEST 3: test smith-waterman aligner
         testSWAligner();
 
-        // TEST 4: test alignment result class
+        // TEST 4: test the class that holds the result of the viral classification
         testClassificationResult();
+
+        // TEST 5: test the class that classifies the unknown viral sequence
+        testViralClassifier();
     }
 }
