@@ -11,6 +11,7 @@ import com.asiahaslam.viralclassifier.algorithms.ScoringMatrix;
 import java.util.*;
 
 public class ViralClassifierApp {
+    // TEST 1: FASTA parser
     static void testFastaParser() {
         System.out.println("Testing FASTA parser:\n");
         try {
@@ -24,6 +25,7 @@ public class ViralClassifierApp {
         }
     }
 
+    // TEST 2: Scoring
     static void testScoring() {
         // scoring matrix
         ScoringMatrix matrix = new ScoringMatrix();
@@ -43,6 +45,7 @@ public class ViralClassifierApp {
                 matrix.getMaxPossibleScore("ATCG", "ATCGAA"));
     }
 
+    // TEST 3: Smith-Waterman aligner
     static void testSWAligner() {
         System.out.println("Testing Smith-Waterman Aligner:\n");
         SmithWatermanAligner aligner = new SmithWatermanAligner();
@@ -68,6 +71,7 @@ public class ViralClassifierApp {
         System.out.println(result4.getFormattedAlignment());
     }
 
+    // TEST 4: Classification result
     static void testClassificationResult() {
         System.out.println("Testing classification result class:\n");
         // create sample family scores
@@ -96,6 +100,7 @@ public class ViralClassifierApp {
         System.out.println("Unknown result: \n" + unknown);
     }
 
+    // TEST 5: Viral Classifier
     static void testViralClassifier() {
         System.out.println("Testing viral sequence classifier:\n");
 
