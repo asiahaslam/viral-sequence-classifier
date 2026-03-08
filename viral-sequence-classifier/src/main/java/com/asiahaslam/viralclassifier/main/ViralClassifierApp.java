@@ -8,9 +8,48 @@ import com.asiahaslam.viralclassifier.sequences.ViralSequence;
 import com.asiahaslam.viralclassifier.sequences.FastaParser;
 import com.asiahaslam.viralclassifier.algorithms.ScoringMatrix;
 
+import java.io.IOException;
 import java.util.*;
 
 public class ViralClassifierApp {
+    static void main(String[] args) {
+        // TEST 1: test FASTA file parsing
+        testFastaParser();
+
+        // TEST 2: test scoring
+        testScoring();
+
+        // TEST 3: test smith-waterman aligner
+        testSWAligner();
+
+        // TEST 4: test the class that holds the result of the viral classification
+        testClassificationResult();
+
+        // TEST 5: test the class that classifies the unknown viral sequence
+        testViralClassifier();
+    }
+
+    // main workflow for application
+    static void runClassification() {
+        System.out.println("RUNNING VIRAL CLASSIFICATION. . .");
+        try {
+            // step 1: load reference sequences
+
+
+            // step 2: create classifier
+
+            // step 3: load unknown sequence to classify
+
+            // step 4: classify sequence
+
+            // step 5: display results
+        }
+        catch (IOException e) {
+            System.err.println("Error in classification pipeline: " + e.getMessage());
+            System.out.println("Make sure you have FASTA files in the 'data/' directory");
+        }
+    }
+
     // TEST 1: FASTA parser
     static void testFastaParser() {
         System.out.println("Testing FASTA parser:\n");
@@ -132,22 +171,5 @@ public class ViralClassifierApp {
         System.out.println("Test 1 (influenza-like): " + classifier.classify(testSeq1));
         System.out.println("Test 2 (corona-like): " + classifier.classify(testSeq2));
         System.out.println("Test 3 (unknown): " + classifier.classify(testSeq3));
-    }
-
-    static void main(String[] args) {
-        // TEST 1: test FASTA file parsing
-        testFastaParser();
-
-        // TEST 2: test scoring
-        testScoring();
-
-        // TEST 3: test smith-waterman aligner
-        testSWAligner();
-
-        // TEST 4: test the class that holds the result of the viral classification
-        testClassificationResult();
-
-        // TEST 5: test the class that classifies the unknown viral sequence
-        testViralClassifier();
     }
 }
