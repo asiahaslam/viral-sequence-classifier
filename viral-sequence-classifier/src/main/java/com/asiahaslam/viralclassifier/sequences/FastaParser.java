@@ -1,11 +1,17 @@
 package com.asiahaslam.viralclassifier.sequences;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 // initial basic logic from https://rosettacode.org/wiki/FASTA_format
 
 public class FastaParser {
-    public static ViralSequence parseFile(String filePath) throws IOException {
+    public static List<ViralSequence> parseMultipleSequences(String filePath, String virusFamily)
+        throws IOException {
+        List<ViralSequence> sequences = new ArrayList<>();
+    }
+    public static ViralSequence parseSingleSequence(String filePath) throws IOException {
         // create empty instance of ViralSequence object
         ViralSequence sequence = new ViralSequence();
         // using BufferedReader instead of Scanner for handling larger/more complex files

@@ -67,6 +67,7 @@ public class ViralClassifier {
         boolean isConfident = bestScore >= confidenceThreshold;
         String finalPrediction = isConfident ? bestFamily : "Unknown";
 
+        // calculate time it took to process
         long processingTime = System.currentTimeMillis() - startTime;
 
         return new ClassificationResult(

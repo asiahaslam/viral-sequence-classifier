@@ -12,12 +12,6 @@ public class ViralSequence {
         this.virusFamily = virusFamily;
     }
 
-    public ViralSequence(String name, String sequence) {
-        this.name = name;
-        this.sequence = sequence.toUpperCase();
-        this.virusFamily = null;
-    }
-
     public ViralSequence() {
         this.name = null;
         this.sequence = null;

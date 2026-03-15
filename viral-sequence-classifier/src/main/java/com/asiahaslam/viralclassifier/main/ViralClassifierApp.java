@@ -50,12 +50,14 @@ public class ViralClassifierApp {
         }
     }
 
+
+
     // TEST 1: FASTA parser
     static void testFastaParser() {
         System.out.println("Testing FASTA parser:\n");
         try {
             // parse a FASTA file
-            ViralSequence sequence = FastaParser.parseFile("data/influenza_b.fasta");
+            ViralSequence sequence = FastaParser.parseSingleSequence("data/influenza_b.fasta");
 
             System.out.println("Sequence: " + sequence.getSequence());
         }
