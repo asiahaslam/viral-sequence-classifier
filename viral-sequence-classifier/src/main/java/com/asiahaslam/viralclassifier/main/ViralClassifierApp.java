@@ -27,6 +27,9 @@ public class ViralClassifierApp {
 
         // TEST 5: test the class that classifies the unknown viral sequence
         testViralClassifier();
+
+        // Run application
+        runClassification();
     }
 
     // main workflow for application
@@ -34,7 +37,7 @@ public class ViralClassifierApp {
         System.out.println("RUNNING VIRAL CLASSIFICATION. . .");
         try {
             // step 1: load reference sequences
-
+            Map<String, List<ViralSequence>> database = loadDatabase();
 
             // step 2: create classifier
 
@@ -50,6 +53,22 @@ public class ViralClassifierApp {
         }
     }
 
+    // loads database from files specified directly
+    private static Map<String, List<ViralSequence>> loadDatabase() throws IOException {
+        Map<String, List<ViralSequence>> database = new HashMap<>();
+
+        // load influenza sequences
+        try {
+            List<ViralSequence> influenzaSeqs = FastaParser.parseMultipleSequences("data/influenza.fasta", "Influenza");
+            database.put("Influenza", influenzaSeqs);
+            System.out.println("Loanded " + influenzaSeqs.size() + "Influenza sequences");
+        }
+        catch (IOException e) {
+            System.out.println("Could not load influenza.fasta");
+        }
+
+        // TODO: get sequences for more viral families and then add code here to load them
+    }
 
 
     // TEST 1: FASTA parser
@@ -57,7 +76,7 @@ public class ViralClassifierApp {
         System.out.println("Testing FASTA parser:\n");
         try {
             // parse a FASTA file
-            ViralSequence sequence = FastaParser.parseSingleSequence("data/influenza_b.fasta");
+            ViralSequence sequence = FastaParser.parseSingleSequence("data/influenza.fasta");
 
             System.out.println("Sequence: " + sequence.getSequence());
         }
