@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class ViralClassifierApp {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         // TEST 1: test FASTA file parsing
         testFastaParser();
 
@@ -40,12 +40,16 @@ public class ViralClassifierApp {
             Map<String, List<ViralSequence>> database = loadDatabase();
 
             // step 2: create classifier
+            ViralClassifier classifier = new ViralClassifier(database);
 
             // step 3: load unknown sequence to classify
+            ViralSequence unknownSequence = loadUnknownSequence();
 
             // step 4: classify sequence
+            ClassificationResult results = classifier.classify(unknownSequence);
 
             // step 5: display results
+            displayResults(results);
         }
         catch (IOException e) {
             System.err.println("Error in classification pipeline: " + e.getMessage());
@@ -61,13 +65,42 @@ public class ViralClassifierApp {
         try {
             List<ViralSequence> influenzaSeqs = FastaParser.parseMultipleSequences("data/influenza.fasta", "Influenza");
             database.put("Influenza", influenzaSeqs);
-            System.out.println("Loanded " + influenzaSeqs.size() + "Influenza sequences");
+            System.out.println("Loaded " + influenzaSeqs.size() + " Influenza sequences");
         }
         catch (IOException e) {
             System.out.println("Could not load influenza.fasta");
         }
 
+        // load herpes sequences
+        try {
+            List<ViralSequence> herpesSeqs = FastaParser.parseMultipleSequences("data/herpes.fasta", "Herpes");
+            database.put("Herpes", herpesSeqs);
+            System.out.println("Loaded " + herpesSeqs.size() + " Herpes sequences");
+        }
+        catch (IOException e) {
+            System.out.println("Could not load herpes.fasta");
+        }
+
+        return database;
+
         // TODO: get sequences for more viral families and then add code here to load them
+    }
+
+    // load sequence to classify
+    private static ViralSequence loadUnknownSequence() throws IOException {
+        try {
+            return FastaParser.parseSingleSequence("data/unknown.fasta");
+        }
+        catch (IOException e) {
+            System.out.println("Could not load unknown.fasta");
+            throw e;
+        }
+    }
+
+    // display classification results to console
+    private static void displayResults(ClassificationResult result) {
+        System.out.println("\n=== Classification Results ===");
+        System.out.println(result.toString());
     }
 
 

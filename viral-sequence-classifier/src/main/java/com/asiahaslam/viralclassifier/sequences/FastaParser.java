@@ -31,7 +31,7 @@ public class FastaParser {
                     }
 
                     // start new sequence
-                    sequenceName = line.substring(1) // remove '>' and make this comment the name of the sequence
+                    sequenceName = line.substring(1); // remove '>' and make this comment the name of the sequence
                     currentSequence = new StringBuilder();
                 }
                 else if (!line.isEmpty()) {
