@@ -109,7 +109,7 @@ public class ViralClassifierApp {
         System.out.println("Testing FASTA parser:\n");
         try {
             // parse a FASTA file
-            ViralSequence sequence = FastaParser.parseSingleSequence("data/influenza.fasta");
+            ViralSequence sequence = FastaParser.parseSingleSequence("data/test.fasta");
 
             System.out.println("Sequence: " + sequence.getSequence());
         }
