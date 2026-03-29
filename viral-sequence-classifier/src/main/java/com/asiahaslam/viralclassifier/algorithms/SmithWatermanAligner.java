@@ -1,6 +1,6 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
-/**
+/*
  * This class will use dynamic programming (typical technique for this algorithm)
  * to implement the Smith-Waterman local sequence alignment algorithm.
  * This algorithm helps us find the best possible alignment between the sequences
@@ -12,19 +12,38 @@ package com.asiahaslam.viralclassifier.algorithms;
  * starting with the position of the max score.
  */
 
-public class SmithWatermanAligner {
-    private final ScoringMatrix scoringMatrix;
-
+/**
+ * standard Smith-Waterman local sequence alignment algorithm
+ * uses full dynamic programming matrix
+ * O(mn) time and space
+ */
+public class SmithWatermanAligner extends SequenceAligner {
     // this constructor uses the default scoring matrix
     public SmithWatermanAligner() {
-        this.scoringMatrix = new ScoringMatrix();
+        super();
     }
 
     // this constructor uses a custom scoring matrix
-    public SmithWatermanAligner(ScoringMatrix scoringMatrix1) {
-        this.scoringMatrix = scoringMatrix1;
+    public SmithWatermanAligner(ScoringMatrix scoringMatrix) {
+        super(scoringMatrix);
     }
 
+    @Override
+    public String getAlgorithmName() {
+        return "Standard Smith-Waterman";
+    }
+
+    @Override
+    public String getTimeComplexity() {
+        return "O(m x n)";
+    }
+
+    @Override
+    public String getSpaceComplexity() {
+        return "O(m x n)";
+    }
+
+    @Override
     public AlignmentResult align(String sequence1, String sequence2) {
         if (sequence1 == null || sequence2 == null || sequence1.isEmpty() || sequence2.isEmpty()) {
             return new AlignmentResult(0.0, 0.0);
@@ -198,8 +217,4 @@ public class SmithWatermanAligner {
                 endPos2
         );
     }
-
-
-
-
 }
