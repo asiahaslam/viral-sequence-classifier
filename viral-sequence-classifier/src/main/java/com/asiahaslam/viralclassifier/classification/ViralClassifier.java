@@ -1,5 +1,6 @@
 package com.asiahaslam.viralclassifier.classification;
 
+import com.asiahaslam.viralclassifier.algorithms.SequenceAligner;
 import com.asiahaslam.viralclassifier.algorithms.SmithWatermanAligner;
 import com.asiahaslam.viralclassifier.algorithms.AlignmentResult;
 import com.asiahaslam.viralclassifier.sequences.ViralSequence;
@@ -9,14 +10,14 @@ import java.util.*;
 // this class classifies unknown sequences using Smith-Waterman alignment
 // it compares the new sequence against a reference database to predict likely virus family
 public class ViralClassifier {
-    private final SmithWatermanAligner aligner;
+    private final SequenceAligner aligner;
     private final Map<String, List<ViralSequence>> referenceDatabase;
     private final double confidenceThreshold;
     private final int maxReferencesPerFamily;
 
     // constructor with default parameters
     public ViralClassifier(Map<String, List<ViralSequence>> referenceDatabase) {
-        this.aligner = new SmithWatermanAligner();
+        this.aligner = new SmithWatermanAligner(); // default to standard algorithm
         this.referenceDatabase = new HashMap<>(referenceDatabase);
         this.confidenceThreshold = 0.70; // default is 70% similarity
         this.maxReferencesPerFamily = 5; // limit to 5 references to improve performance
@@ -29,7 +30,7 @@ public class ViralClassifier {
      * @param confidenceThreshold minimum confidence for classification from 0.0 to 1.0
      * @param maxReferencesPerFamily max reference sequences to check per family
      */
-    public ViralClassifier(SmithWatermanAligner aligner, Map<String, List<ViralSequence>> referenceDatabase,
+    public ViralClassifier(SequenceAligner aligner, Map<String, List<ViralSequence>> referenceDatabase,
                            double confidenceThreshold, int maxReferencesPerFamily) {
         this.aligner = aligner;
         this.referenceDatabase = referenceDatabase;
@@ -51,7 +52,7 @@ public class ViralClassifier {
             return ClassificationResult.createUnknown(
                     unknownSequence != null ? unknownSequence.getName() : "null",
                     new HashMap<>(),
-                    "Smith-Waterman",
+                    aligner.getAlgorithmName(),
                     System.currentTimeMillis() - startTime
                     );
         }
@@ -76,7 +77,7 @@ public class ViralClassifier {
                 bestScore,
                 isConfident,
                 familyScores,
-                "Smith-Waterman",
+                aligner.getAlgorithmName(),
                 processingTime
         );
     }
@@ -136,7 +137,9 @@ public class ViralClassifier {
 
             catch (Exception e) {
                 // log error but continue aligning other references
-                System.err.println("Error aligning with reference" + reference.getName() + " : " + e.getMessage());
+                System.err.println(
+                        "Error aligning with reference" + reference.getName() + " using " + aligner.getAlgorithmName() + " : " + e.getMessage()
+                );
             }
         }
         return bestScore;
@@ -154,7 +157,7 @@ public class ViralClassifier {
     // getters
     public double getConfidenceThreshold() { return confidenceThreshold; }
     public int getMaxReferencesPerFamily() { return maxReferencesPerFamily; }
-    public SmithWatermanAligner getAligner() { return aligner; }
+    public SequenceAligner getAligner() { return aligner; }
 
 }
 
