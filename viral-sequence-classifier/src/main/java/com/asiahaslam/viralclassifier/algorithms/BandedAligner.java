@@ -35,16 +35,19 @@ public class BandedAligner extends SequenceAligner {
 
     @Override
     public String getAlgorithmName() {
+
         return "Banded Smith=Waterman (band=" + bandWidth + ")";
     }
 
     @Override
     public String getTimeComplexity() {
+
         return "O(k x n) where k =" + bandWidth;
     }
 
     @Override
     public String getSpaceComplexity() {
+
         return "O(k x n) where k =" + bandWidth;
     }
 
@@ -81,7 +84,7 @@ public class BandedAligner extends SequenceAligner {
 
         // fill in the banded matrix
         for (int i = 1; i <= m; i++) {
-            int jStart = Math.max(1, i = bandWidth);
+            int jStart = Math.max(1, i - bandWidth);
             int jEnd = Math.min(n, i + bandWidth);
 
             for (int j = jStart; j <= jEnd; j++) {
@@ -99,23 +102,19 @@ public class BandedAligner extends SequenceAligner {
                 double insert = Double.NEGATIVE_INFINITY;
 
                 // match/mismatch (diagonal)
-                if (i > 0 && j > 0) {
-                    int prevBandJ = (j - 1) - (i - 1) + bandWidth;
-                    if (prevBandJ >= 0 && prevBandJ < 2 * bandWidth + 1) {
-                        match = matrix[i - 1][prevBandJ] + scoringMatrix.getScore(char1, char2);
-                    }
+                int prevBandJ = (j - 1) - (i - 1) + bandWidth;
+                if (prevBandJ >= 0 && prevBandJ < 2 * bandWidth + 1) {
+                    match = matrix[i - 1][prevBandJ] + scoringMatrix.getScore(char1, char2);
                 }
 
                 // deletion (up)
-                if (i > 0) {
-                    int upBandJ = j - (i - 1) + bandWidth;
-                    if (upBandJ >= 0 && upBandJ < 2 * bandWidth + 1) {
-                        delete = matrix[i - 1][upBandJ] + scoringMatrix.getGapPenalty();
-                    }
+                int upBandJ = j - (i - 1) + bandWidth;
+                if (upBandJ >= 0 && upBandJ < 2 * bandWidth + 1) {
+                    delete = matrix[i - 1][upBandJ] + scoringMatrix.getGapPenalty();
                 }
 
                 // insertion (left)
-                if (j > 0) {
+                if (j > jStart) {
                     int leftBandJ = (j - 1) - i + bandWidth;
                     if (leftBandJ >= 0 && leftBandJ < 2 * bandWidth + 1) {
                         insert = matrix[i][leftBandJ] + scoringMatrix.getGapPenalty();
@@ -124,6 +123,8 @@ public class BandedAligner extends SequenceAligner {
 
                 // take the maximum score or 0 (Smith-Waterman algorithm)
                 double score = Math.max(0, Math.max(match, Math.max(delete, insert)));
+                // store computed score
+                matrix[i][bandJ] = score;
 
                 // track maximum
                 if (score > maxScore) {
