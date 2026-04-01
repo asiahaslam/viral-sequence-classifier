@@ -1,12 +1,8 @@
 package com.asiahaslam.viralclassifier.main;
 
-import com.asiahaslam.viralclassifier.algorithms.AlignmentResult;
-import com.asiahaslam.viralclassifier.algorithms.SmithWatermanAligner;
-import com.asiahaslam.viralclassifier.classification.ClassificationResult;
-import com.asiahaslam.viralclassifier.classification.ViralClassifier;
-import com.asiahaslam.viralclassifier.sequences.ViralSequence;
-import com.asiahaslam.viralclassifier.sequences.FastaParser;
-import com.asiahaslam.viralclassifier.algorithms.ScoringMatrix;
+import com.asiahaslam.viralclassifier.classification.*;
+import com.asiahaslam.viralclassifier.sequences.*;
+import com.asiahaslam.viralclassifier.algorithms.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,16 +36,23 @@ public class ViralClassifierApp {
             Map<String, List<ViralSequence>> database = loadDatabase();
 
             // step 2: create classifier
-            ViralClassifier classifier = new ViralClassifier(database);
+            ViralClassifier bandedClassifier = new ViralClassifier(new BandedAligner(), database, 0.70, 5);
+            ViralClassifier smithWatermanClassifier = new ViralClassifier(new SpaceOptimizedAligner(), database, 0.70, 5);
+            ViralClassifier spaceOptimizedClassifier = new ViralClassifier(new SmithWatermanAligner(), database, 0.70, 5);
 
             // step 3: load unknown sequence to classify
             ViralSequence unknownSequence = loadUnknownSequence();
 
             // step 4: classify sequence
-            ClassificationResult results = classifier.classify(unknownSequence);
+            ClassificationResult bandedResults = bandedClassifier.classify(unknownSequence);
+            ClassificationResult smithWatermanResults = smithWatermanClassifier.classify(unknownSequence);
+            ClassificationResult spaceOptimizedResults = spaceOptimizedClassifier.classify(unknownSequence);
 
             // step 5: display results
-            displayResults(results);
+            displayResults(bandedResults);
+            displayResults(smithWatermanResults);
+            displayResults(spaceOptimizedResults);
+
         }
         catch (IOException e) {
             System.err.println("Error in classification pipeline: " + e.getMessage());
