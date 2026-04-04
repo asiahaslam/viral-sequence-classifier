@@ -48,7 +48,11 @@ public class ViralClassifier {
 
         // measure memory before classification
         Runtime runtime = Runtime.getRuntime();
-        runtime.gc(); // suggest garbage collection to make measurement more accurate
+        for (int i = 0; i < 5; i++) {
+            runtime.gc(); // suggest garbage collection to make measurement more accurate
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
+        }
+
         long memoryBefore = runtime.totalMemory() - runtime.freeMemory();
 
 
@@ -78,6 +82,10 @@ public class ViralClassifier {
         String finalPrediction = isConfident ? bestFamily : "Unknown";
 
         // measure memory after classification
+        for (int i = 0; i < 5; i++) {
+            runtime.gc(); // suggest garbage collection to make measurement more accurate
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
+        }
         long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
         long memoryUsed = Math.max(0, memoryAfter - memoryBefore);
 
