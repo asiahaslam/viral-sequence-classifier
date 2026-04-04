@@ -2,7 +2,13 @@
   <dictionary name="project">
     <words>
       <w>atcgaa</w>
+      <w>atcgatcgatcgatcgatcc</w>
+      <w>atcgatcgatcgatcgatcg</w>
+      <w>atcgatcgatcgattt</w>
+      <w>ggccggccggccggccggca</w>
+      <w>ggccggccggccggccggcc</w>
       <w>startpos</w>
+      <w>ttttttttttttttttttttt</w>
     </words>
   </dictionary>
 </component>

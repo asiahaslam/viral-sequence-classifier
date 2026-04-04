@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class ViralClassifierApp {
-    public static void main(String[] args) {
+    static void main() {
         // TEST 1: test FASTA file parsing
         testFastaParser();
 
@@ -30,15 +30,21 @@ public class ViralClassifierApp {
 
     // main workflow for application
     static void runClassification() {
-        System.out.println("RUNNING VIRAL CLASSIFICATION. . .");
+        System.out.println("\n\nRUNNING VIRAL CLASSIFICATION. . .");
         try {
             // step 1: load reference sequences
             Map<String, List<ViralSequence>> database = loadDatabase();
 
             // step 2: create classifier
-            ViralClassifier bandedClassifier = new ViralClassifier(new BandedAligner(), database, 0.70, 5);
-            ViralClassifier smithWatermanClassifier = new ViralClassifier(new SpaceOptimizedAligner(), database, 0.70, 5);
-            ViralClassifier spaceOptimizedClassifier = new ViralClassifier(new SmithWatermanAligner(), database, 0.70, 5);
+            ViralClassifier bandedClassifier = new ViralClassifier(
+                    new BandedAligner(), database, 0.70, 10
+            );
+            ViralClassifier smithWatermanClassifier = new ViralClassifier(
+                    new SpaceOptimizedAligner(), database, 0.70, 10
+            );
+            ViralClassifier spaceOptimizedClassifier = new ViralClassifier(
+                    new SmithWatermanAligner(), database, 0.70, 10
+            );
 
             // step 3: load unknown sequence to classify
             ViralSequence unknownSequence = loadUnknownSequence();
@@ -49,9 +55,9 @@ public class ViralClassifierApp {
             ClassificationResult spaceOptimizedResults = spaceOptimizedClassifier.classify(unknownSequence);
 
             // step 5: display results
-            displayResults(bandedResults);
-            displayResults(smithWatermanResults);
-            displayResults(spaceOptimizedResults);
+            displayResults(bandedResults, "Banded Smith-Waterman");
+            displayResults(smithWatermanResults, "Smith-Waterman");
+            displayResults(spaceOptimizedResults, "Space-Optimized Smith-Waterman");
 
         }
         catch (IOException e) {
@@ -64,32 +70,72 @@ public class ViralClassifierApp {
     private static Map<String, List<ViralSequence>> loadDatabase() throws IOException {
         Map<String, List<ViralSequence>> database = new HashMap<>();
 
-        // load influenza sequences
+        // load influenza A sequences
         try {
-            List<ViralSequence> influenzaSeqs = FastaParser.parseMultipleSequences("data/influenza.fasta", "Influenza");
-            database.put("Influenza", influenzaSeqs);
-            System.out.println("Loaded " + influenzaSeqs.size() + " Influenza sequences");
+            List<ViralSequence> influenzaSeqs = FastaParser.parseMultipleSequences(
+                    "data/influenza_nucleocapsid.fasta", "Human Influenza A"
+            );
+            database.put("Influenza A", influenzaSeqs);
+            System.out.println("Loaded " + influenzaSeqs.size() + " Human Influenza A sequences");
         }
         catch (IOException e) {
-            System.out.println("Could not load influenza.fasta");
+            System.out.println("Could not load influenza_nucleocapsid.fasta");
         }
 
-        // load herpes sequences
-        try {
-            List<ViralSequence> herpesSeqs = FastaParser.parseMultipleSequences("data/herpes.fasta", "Herpes");
-            database.put("Herpes", herpesSeqs);
-            System.out.println("Loaded " + herpesSeqs.size() + " Herpes sequences");
+        // load herpesvirus 1 sequences
+        /*try {
+            List<ViralSequence> herpesSeqs = FastaParser.parseMultipleSequences(
+                    "data/herpes1.fasta", "Herpesvirus 1"
+            );
+            database.put("Herpesvirus 1", herpesSeqs);
+            System.out.println("Loaded " + herpesSeqs.size() + " Herpesvirus 1 sequences");
         }
         catch (IOException e) {
-            System.out.println("Could not load herpes.fasta");
+            System.out.println("Could not load herpes1.fasta");
+        }*/
+
+        // load human papillomavirus sequences
+        try {
+            List<ViralSequence> papillomavirusSeqs = FastaParser.parseMultipleSequences(
+                    "data/papillomavirus_L1.fasta", "Human Papillomavirus"
+            );
+            database.put("Human Papillomavirus", papillomavirusSeqs);
+            System.out.println("Loaded " + papillomavirusSeqs.size() + " Human papillomavirus sequences");
+        }
+        catch (IOException e) {
+            System.out.println("Could not load papillomavirus_L1.fasta");
         }
 
-        return database;
+        // load adenovirus sequences
+        try {
+            List<ViralSequence> adenovirusSeqs = FastaParser.parseMultipleSequences(
+                    "data/adenovirus_hexon.fasta", "Adenovirus"
+            );
+            database.put("Adenovirus", adenovirusSeqs);
+            System.out.println("Loaded " + adenovirusSeqs.size() + " Adenovirus sequences");
+        }
+        catch (IOException e) {
+            System.out.println("Could not load adenovirus_hexon.fasta");
+        }
+
+        // load polyomavirus sequences
+        try {
+            List<ViralSequence> polyomavirusSeqs = FastaParser.parseMultipleSequences(
+                    "data/polyomavirus_VP1.fasta", "Polyomavirus"
+            );
+            database.put("Polyomavirus", polyomavirusSeqs);
+            System.out.println("Loaded " + polyomavirusSeqs.size() + " Polyomavirus sequences");
+        }
+        catch (IOException e) {
+            System.out.println("Could not load polyomavirus_VP1.fasta");
+        }
 
         // TODO: get sequences for more viral families and then add code here to load them
+
+        return database;
     }
 
-    // load sequence to classify
+    // load unknown sequence to classify
     private static ViralSequence loadUnknownSequence() throws IOException {
         try {
             return FastaParser.parseSingleSequence("data/unknown.fasta");
@@ -101,8 +147,8 @@ public class ViralClassifierApp {
     }
 
     // display classification results to console
-    private static void displayResults(ClassificationResult result) {
-        System.out.println("\n=== Classification Results ===");
+    private static void displayResults(ClassificationResult result, String algorithmName) {
+        System.out.println("\n=== " + algorithmName + " Classification Results ===");
         System.out.println(result.toString());
     }
 
@@ -201,6 +247,20 @@ public class ViralClassifierApp {
         System.out.println("Testing viral sequence classifier:\n");
 
         // create a mock database of reference sequences
+        ViralClassifier classifier = getViralClassifier();
+
+        // test classification
+        ViralSequence testSeq1 = new ViralSequence("test1", "ATCGATCGATCGATTT", "Unknown");
+        ViralSequence testSeq2 = new ViralSequence("test2", "GGCCGGCCGGCCGGCCGGCC", "Unknown");
+        ViralSequence testSeq3 = new ViralSequence("test3", "TTTTTTTTTTTTTTTTTTTTT", "Unknown");
+
+        System.out.println("Test 1 (influenza-like): " + classifier.classify(testSeq1));
+        System.out.println("Test 2 (corona-like): " + classifier.classify(testSeq2));
+        System.out.println("Test 3 (unknown): " + classifier.classify(testSeq3));
+    }
+
+    // create the mock reference sequence database
+    private static ViralClassifier getViralClassifier() {
         Map<String, List<ViralSequence>> database = new HashMap<>();
 
         // add some sample reference sequences to the database
@@ -218,15 +278,6 @@ public class ViralClassifierApp {
         database.put("Coronavirus", coronaRefs);
 
         // create classifier instance
-        ViralClassifier classifier = new ViralClassifier(database);
-
-        // test classification
-        ViralSequence testSeq1 = new ViralSequence("test1", "ATCGATCGATCGATTT", "Unknown");
-        ViralSequence testSeq2 = new ViralSequence("test2", "GGCCGGCCGGCCGGCCGGCC", "Unknown");
-        ViralSequence testSeq3 = new ViralSequence("test3", "TTTTTTTTTTTTTTTTTTTTT", "Unknown");
-
-        System.out.println("Test 1 (influenza-like): " + classifier.classify(testSeq1));
-        System.out.println("Test 2 (corona-like): " + classifier.classify(testSeq2));
-        System.out.println("Test 3 (unknown): " + classifier.classify(testSeq3));
+        return new ViralClassifier(database);
     }
 }
