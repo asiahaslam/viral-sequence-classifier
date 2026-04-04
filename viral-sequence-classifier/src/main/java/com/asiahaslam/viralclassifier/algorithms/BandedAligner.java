@@ -1,5 +1,7 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
+import java.util.Arrays;
+
 /**
  * Banded Smith-Waterman aligner
  * Only computes the alignment within a diagonal band
@@ -63,20 +65,17 @@ public class BandedAligner extends SequenceAligner {
         int m = sequence1.length();
         int n = sequence2.length();
 
-        // create the banded matrix (only store the values within the band)
-        double[][] matrix = new double[m + 1][2 * bandWidth + 1];
+        // create the banded matrix using rolling arrays (only store the values within the band)
+        int bandSize = 2 * bandWidth + 1;
+        double[] prevRow = new double[bandSize];
+        double[] currRow = new double[bandSize];
 
-        // initialize the matrix
-        for (int i = 0; i <= m; i++) {
-            for (int j = 0; j < 2 * bandWidth + 1; j++) {
-                matrix[i][j] = Double.NEGATIVE_INFINITY; // invalid positions
-            }
-        }
+        // initialize with negative values
+        Arrays.fill(prevRow, Double.MIN_VALUE);
+        Arrays.fill(currRow, Double.MIN_VALUE);
 
-        // set starting position
-        if (bandWidth < 2 * bandWidth + 1) {
-            matrix[0][bandWidth] = 0; // middle of the band corresponds to (0,0)
-        }
+        // set starting position (middle of band is diagonal)
+        prevRow[bandWidth] = 0.0;
 
         double maxScore = 0.0;
         int maxI = 0;
@@ -84,47 +83,50 @@ public class BandedAligner extends SequenceAligner {
 
         // fill in the banded matrix
         for (int i = 1; i <= m; i++) {
+            Arrays.fill(currRow, Double.MIN_VALUE); // reset current row
+
             int jStart = Math.max(1, i - bandWidth);
             int jEnd = Math.min(n, i + bandWidth);
 
             for (int j = jStart; j <= jEnd; j++) {
                 int bandJ = j - i + bandWidth; // convert to band coordinates
 
-                if (bandJ < 0 || bandJ >= 2 * bandWidth + 1) {
+                // skip if outside band boundaries
+                if (bandJ < 0 || bandJ >= bandSize) {
                     continue;
                 }
 
                 char char1 = sequence1.charAt(i - 1);
                 char char2 = sequence2.charAt(j - 1);
 
-                double match = Double.NEGATIVE_INFINITY;
-                double delete = Double.NEGATIVE_INFINITY;
-                double insert = Double.NEGATIVE_INFINITY;
+                double match = Double.MIN_VALUE;
+                double delete = Double.MIN_VALUE;
+                double insert = Double.MIN_VALUE;
 
                 // match/mismatch (diagonal)
                 int prevBandJ = (j - 1) - (i - 1) + bandWidth;
-                if (prevBandJ >= 0 && prevBandJ < 2 * bandWidth + 1) {
-                    match = matrix[i - 1][prevBandJ] + scoringMatrix.getScore(char1, char2);
+                if (prevBandJ >= 0 && prevBandJ < bandSize && prevRow[prevBandJ] != Double.MIN_VALUE) {
+                    match = prevRow[prevBandJ] + scoringMatrix.getScore(char1, char2);
                 }
 
                 // deletion (up)
                 int upBandJ = j - (i - 1) + bandWidth;
-                if (upBandJ >= 0 && upBandJ < 2 * bandWidth + 1) {
-                    delete = matrix[i - 1][upBandJ] + scoringMatrix.getGapPenalty();
+                if (upBandJ >= 0 && upBandJ < bandSize && prevRow[upBandJ] != Double.MIN_VALUE) {
+                    delete = prevRow[upBandJ] + scoringMatrix.getGapPenalty();
                 }
 
                 // insertion (left)
                 if (j > jStart) {
                     int leftBandJ = (j - 1) - i + bandWidth;
-                    if (leftBandJ >= 0 && leftBandJ < 2 * bandWidth + 1) {
-                        insert = matrix[i][leftBandJ] + scoringMatrix.getGapPenalty();
+                    if (leftBandJ >= 0 && leftBandJ < bandSize && currRow[leftBandJ] != Double.MIN_VALUE) {
+                        insert = currRow[leftBandJ] + scoringMatrix.getGapPenalty();
                     }
                 }
 
                 // take the maximum score or 0 (Smith-Waterman algorithm)
                 double score = Math.max(0, Math.max(match, Math.max(delete, insert)));
                 // store computed score
-                matrix[i][bandJ] = score;
+                currRow[bandJ] = score;
 
                 // track maximum
                 if (score > maxScore) {
@@ -133,6 +135,10 @@ public class BandedAligner extends SequenceAligner {
                     maxJ = j;
                 }
             }
+            // swap arrays for next iteration
+            double[] temp = prevRow;
+            prevRow = currRow;
+            currRow = temp;
         }
 
         // calculate normalized score
