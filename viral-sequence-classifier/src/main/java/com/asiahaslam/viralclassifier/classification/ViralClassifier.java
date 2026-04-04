@@ -46,14 +46,23 @@ public class ViralClassifier {
     public ClassificationResult classify(ViralSequence unknownSequence) {
         long startTime = System.currentTimeMillis(); // for calculating processing time
 
+        // measure memory before classification
+        Runtime runtime = Runtime.getRuntime();
+        runtime.gc(); // suggest garbage collection to make measurement more accurate
+        long memoryBefore = runtime.totalMemory() - runtime.freeMemory();
+
+
         // validate input
         // if no sequence, use createUnknown to create an unknown viral sequence
         if (unknownSequence == null || unknownSequence.getSequence().isEmpty()) {
+            long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
+            long memoryUsed = Math.max(0, memoryAfter - memoryBefore);
             return ClassificationResult.createUnknown(
                     unknownSequence != null ? unknownSequence.getName() : "null",
                     new HashMap<>(),
                     aligner.getAlgorithmName(),
-                    System.currentTimeMillis() - startTime
+                    System.currentTimeMillis() - startTime,
+                    memoryUsed
                     );
         }
 
@@ -68,6 +77,10 @@ public class ViralClassifier {
         boolean isConfident = bestScore >= confidenceThreshold;
         String finalPrediction = isConfident ? bestFamily : "Unknown";
 
+        // measure memory after classification
+        long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
+        long memoryUsed = Math.max(0, memoryAfter - memoryBefore);
+
         // calculate time it took to process
         long processingTime = System.currentTimeMillis() - startTime;
 
@@ -78,7 +91,8 @@ public class ViralClassifier {
                 isConfident,
                 familyScores,
                 aligner.getAlgorithmName(),
-                processingTime
+                processingTime,
+                memoryUsed
         );
     }
 

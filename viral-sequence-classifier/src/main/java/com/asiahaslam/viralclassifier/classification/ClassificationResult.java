@@ -11,6 +11,7 @@ public class ClassificationResult {
     private final Map<String, Double> allFamilyScores;
     private final String algorithmUsed;
     private final long processingTimeMs;
+    private final long memoryUsedBytes;
 
     /**
      * Primary constructor for new viral classification results
@@ -23,7 +24,7 @@ public class ClassificationResult {
      * @param processingTimeMs time taken for classification in milliseconds
      */
     public ClassificationResult(String sequenceId, String predictedFamily, double confidence, boolean isPredictionConfident,
-                                Map<String, Double> allFamilyScores, String algorithmUsed, long processingTimeMs) {
+                                Map<String, Double> allFamilyScores, String algorithmUsed, long processingTimeMs, long memoryUsedBytes) {
         this.sequenceId = sequenceId;
         this.predictedFamily = predictedFamily;
         this.confidence = confidence;
@@ -31,20 +32,29 @@ public class ClassificationResult {
         this.allFamilyScores = allFamilyScores;
         this.algorithmUsed = algorithmUsed;
         this.processingTimeMs = processingTimeMs;
+        this.memoryUsedBytes = memoryUsedBytes;
     }
 
     // simple constructor for classifications that are uncertain
     public static ClassificationResult createUnknown(String sequenceId, Map<String, Double> allFamilyScores,
-                                              String algorithmUsed, long processingTimeMs) {
+                                              String algorithmUsed, long processingTimeMs, long memoryUsedBytes) {
         return new ClassificationResult(sequenceId, "Unknown", 0.0, false,
-                allFamilyScores, algorithmUsed, processingTimeMs);
+                allFamilyScores, algorithmUsed, processingTimeMs, memoryUsedBytes);
+    }
+
+    public double getMemoryUsedMB() {
+        return memoryUsedBytes / (1024.0 * 1024.0);
+    }
+
+    public double getMemoryUsedKB() {
+        return memoryUsedBytes / 1024.0;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "ClassificationResult{id='%s', predicted='%s', confidence = %.3f, confident=%s, time=%dms",
-                sequenceId, predictedFamily, confidence, isPredictionConfident, processingTimeMs
+                "ClassificationResult{id='%s', predicted='%s', confidence = %.3f, confident=%s, time=%dms, memory=%.2fKB}",
+                sequenceId, predictedFamily, confidence, isPredictionConfident, processingTimeMs, getMemoryUsedKB()
         );
     }
 }

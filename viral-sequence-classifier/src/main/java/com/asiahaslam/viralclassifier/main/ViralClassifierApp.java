@@ -36,11 +36,11 @@ public class ViralClassifierApp {
             Map<String, List<ViralSequence>> database = loadDatabase();
 
             // step 2: create classifier
-            ViralClassifier bandedClassifier = new ViralClassifier(
-                    new BandedAligner(), database, 0.70, 10
-            );
             ViralClassifier smithWatermanClassifier = new ViralClassifier(
                     new SpaceOptimizedAligner(), database, 0.70, 10
+            );
+            ViralClassifier bandedClassifier = new ViralClassifier(
+                    new BandedAligner(), database, 0.70, 10
             );
             ViralClassifier spaceOptimizedClassifier = new ViralClassifier(
                     new SmithWatermanAligner(), database, 0.70, 10
@@ -50,13 +50,13 @@ public class ViralClassifierApp {
             ViralSequence unknownSequence = loadUnknownSequence();
 
             // step 4: classify sequence
-            ClassificationResult bandedResults = bandedClassifier.classify(unknownSequence);
             ClassificationResult smithWatermanResults = smithWatermanClassifier.classify(unknownSequence);
+            ClassificationResult bandedResults = bandedClassifier.classify(unknownSequence);
             ClassificationResult spaceOptimizedResults = spaceOptimizedClassifier.classify(unknownSequence);
 
             // step 5: display results
-            displayResults(bandedResults, "Banded Smith-Waterman");
             displayResults(smithWatermanResults, "Smith-Waterman");
+            displayResults(bandedResults, "Banded Smith-Waterman");
             displayResults(spaceOptimizedResults, "Space-Optimized Smith-Waterman");
 
         }
@@ -129,8 +129,6 @@ public class ViralClassifierApp {
         catch (IOException e) {
             System.out.println("Could not load polyomavirus_VP1.fasta");
         }
-
-        // TODO: get sequences for more viral families and then add code here to load them
 
         return database;
     }
@@ -230,12 +228,13 @@ public class ViralClassifierApp {
                 true,
                 familyScores,
                 "Smith-Waterman",
-                1250
+                1250,
+                500
         );
 
         // create unknown classification
         ClassificationResult unknown = ClassificationResult.createUnknown(
-                "unknown_seq1", familyScores, "Smith-Waterman", 800
+                "unknown_seq1", familyScores, "Smith-Waterman", 800, 500
         );
 
         System.out.println("Basic result: \n" + result);
