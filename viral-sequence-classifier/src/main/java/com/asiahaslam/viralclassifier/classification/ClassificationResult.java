@@ -42,12 +42,59 @@ public class ClassificationResult {
                 allFamilyScores, algorithmUsed, processingTimeMs, memoryUsedBytes);
     }
 
-    public double getMemoryUsedMB() {
-        return memoryUsedBytes / (1024.0 * 1024.0);
+    // find virus family with the second-highest score
+    public String getSecondBestFamily() {
+        String best = null;
+        String secondBest = null;
+        double bestScore = -1;
+        double secondBestScore = -1;
+
+        for (Map.Entry<String, Double> entry : allFamilyScores.entrySet()) {
+            if (entry.getValue() > bestScore) {
+                secondBest = best;
+                secondBestScore = bestScore;
+                best = entry.getKey();
+                bestScore = entry.getValue();
+            }
+            else if (entry.getValue() > secondBestScore) {
+                secondBest = entry.getKey();
+                secondBestScore = entry.getValue();
+            }
+        }
+
+        return secondBest;
+    }
+
+    public String getAlgorithmUsed() {
+        return algorithmUsed;
+    }
+
+    public long getProcessingTimeMs() {
+        return processingTimeMs;
+    }
+
+    public long getMemoryUsedBytes() {
+        return memoryUsedBytes;
     }
 
     public double getMemoryUsedKB() {
         return memoryUsedBytes / 1024.0;
+    }
+
+    public String getSequenceId() {
+        return sequenceId;
+    }
+
+    public String getPredictedFamily() {
+        return predictedFamily;
+    }
+
+    public double getConfidence() {
+        return confidence;
+    }
+
+    public boolean isPredictionConfident() {
+        return isPredictionConfident;
     }
 
     @Override
