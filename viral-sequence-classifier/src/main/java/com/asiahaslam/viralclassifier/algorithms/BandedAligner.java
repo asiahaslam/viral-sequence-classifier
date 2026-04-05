@@ -38,19 +38,19 @@ public class BandedAligner extends SequenceAligner {
     @Override
     public String getAlgorithmName() {
 
-        return "Banded Smith=Waterman (band=" + bandWidth + ")";
+        return "Banded Smith-Waterman (band = " + bandWidth + ")";
     }
 
     @Override
     public String getTimeComplexity() {
 
-        return "O(k x n) where k =" + bandWidth;
+        return "O(k x n) where k = " + bandWidth;
     }
 
     @Override
     public String getSpaceComplexity() {
 
-        return "O(k x n) where k =" + bandWidth;
+        return "O(k x n) where k = " + bandWidth;
     }
 
     @Override

@@ -40,7 +40,7 @@ public class SpaceOptimizedAligner extends SequenceAligner {
 
     @Override
     public AlignmentResult align(String sequence1, String sequence2) {
-        if (sequence1 == null || sequence1.isEmpty() || sequence2.isEmpty()) {
+        if (sequence1 == null || sequence1.isEmpty() || sequence2 == null || sequence2.isEmpty()) {
             return new AlignmentResult(0.0, 0.0);
         }
 
