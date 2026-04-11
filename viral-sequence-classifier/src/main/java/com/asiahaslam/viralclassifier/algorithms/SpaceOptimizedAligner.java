@@ -44,6 +44,13 @@ public class SpaceOptimizedAligner extends SequenceAligner {
             return new AlignmentResult(0.0, 0.0);
         }
 
+        // make sure the shorter sequence is the one on the column axis
+        if (sequence1.length() < sequence2.length()) {
+            String temp = sequence1;
+            sequence1 = sequence2;
+            sequence2 = temp;
+        }
+
         int rows = sequence1.length() + 1;
         int cols = sequence2.length() + 1;
 
@@ -67,6 +74,7 @@ public class SpaceOptimizedAligner extends SequenceAligner {
             currRow[0] = 0; // initialize the first column
 
             for (int j = 1; j < cols; j++) {
+                // find current nucleotides being compared
                 char char1 = sequence1.charAt(i - 1);
                 char char2 = sequence2.charAt(j - 1);
 
