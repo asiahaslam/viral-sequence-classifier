@@ -62,7 +62,7 @@ public class BandedAlignerTest {
     void testAlgorithmInfo() {
         assertEquals("Banded Smith-Waterman (band = 20)", aligner.getAlgorithmName());
         assertEquals("O(k x n) where k = 20", aligner.getTimeComplexity());
-        assertEquals("O(k x n) where k = 20", aligner.getSpaceComplexity());
+        assertEquals("O(k) where k = 20", aligner.getSpaceComplexity());
     }
 
     @Test
