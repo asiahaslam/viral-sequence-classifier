@@ -22,7 +22,7 @@ public class FastaParser {
 
                 if (line.startsWith(">")) { // check if line starts with FASTA comment
                     // save previous sequence if it exists
-                    if (sequenceName != null && currentSequence.length() > 0) {
+                    if (sequenceName != null && !currentSequence.isEmpty()) {
                         sequences.add(new ViralSequence(
                                 sequenceName,
                                 currentSequence.toString(),
@@ -41,7 +41,7 @@ public class FastaParser {
             }
 
             // remember final sequence after breaking out of while loop
-            if (sequenceName != null && currentSequence.length() > 0) {
+            if (sequenceName != null && !currentSequence.isEmpty()) {
                 sequences.add(new ViralSequence(
                         sequenceName,
                         currentSequence.toString(),
@@ -68,11 +68,11 @@ public class FastaParser {
                 line = line.trim();
 
                 // if this line is a comment, set the virus name to contents of the comment
-                if (line.charAt(0) == '>') {
+                if (line.startsWith(">")) {
                     sequence.setVirusName(line.substring(1));
                 }
                 // if line is not a comment and not blank, add contents to the current sequence
-                else if (!line.isBlank()) {
+                else if (!line.isEmpty()) {
                     currentSequence.append(line);
                 }
             }
