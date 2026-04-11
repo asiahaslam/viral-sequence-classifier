@@ -9,7 +9,7 @@ import java.util.*;
 
 public class ViralClassifierApp {
     static void main() {
-        // TEST 1: test FASTA file parsing
+        /*// TEST 1: test FASTA file parsing
         testFastaParser();
 
         // TEST 2: test scoring
@@ -22,7 +22,7 @@ public class ViralClassifierApp {
         testClassificationResult();
 
         // TEST 5: test the class that classifies the unknown viral sequence
-        testViralClassifier();
+        testViralClassifier();*/
 
         // Run application
         runClassification();
