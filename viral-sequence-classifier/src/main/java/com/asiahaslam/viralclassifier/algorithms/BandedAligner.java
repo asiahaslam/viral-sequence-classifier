@@ -65,17 +65,23 @@ public class BandedAligner extends SequenceAligner {
         int m = sequence1.length();
         int n = sequence2.length();
 
-        // create the banded matrix using rolling arrays (only store the values within the band)
         int bandSize = 2 * bandWidth + 1;
-        double[] prevRow = new double[bandSize];
-        double[] currRow = new double[bandSize];
 
-        // initialize with negative values
-        Arrays.fill(prevRow, Double.MIN_VALUE);
-        Arrays.fill(currRow, Double.MIN_VALUE);
+        // only store the values within the band
+        double[][] matrix = new double[m + 1][bandSize];
 
-        // set starting position (middle of band is diagonal)
-        prevRow[bandWidth] = 0.0;
+        // initialize the matrix
+        // TODO: this is memory-intensive
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j < bandSize; j++) {
+                matrix[i][j] = -1;
+            }
+        }
+
+        // set starting position (middle of band is [0,0])
+        if (bandWidth < bandSize) {
+            matrix[0][bandWidth] = 0;
+        }
 
         double maxScore = 0.0;
         int maxI = 0;
@@ -83,7 +89,6 @@ public class BandedAligner extends SequenceAligner {
 
         // fill in the banded matrix
         for (int i = 1; i <= m; i++) {
-            Arrays.fill(currRow, Double.MIN_VALUE); // reset current row
 
             int jStart = Math.max(1, i - bandWidth);
             int jEnd = Math.min(n, i + bandWidth);
@@ -99,34 +104,35 @@ public class BandedAligner extends SequenceAligner {
                 char char1 = sequence1.charAt(i - 1);
                 char char2 = sequence2.charAt(j - 1);
 
-                double match = Double.MIN_VALUE;
-                double delete = Double.MIN_VALUE;
-                double insert = Double.MIN_VALUE;
+                double match = -1;
+                double delete = -1;
+                double insert = -1;
 
                 // match/mismatch (diagonal)
                 int prevBandJ = (j - 1) - (i - 1) + bandWidth;
-                if (prevBandJ >= 0 && prevBandJ < bandSize && prevRow[prevBandJ] != Double.MIN_VALUE) {
-                    match = prevRow[prevBandJ] + scoringMatrix.getScore(char1, char2);
+                if (prevBandJ >= 0 && prevBandJ < bandSize) {
+                    match = matrix[i-1][prevBandJ] + scoringMatrix.getScore(char1, char2);
                 }
 
                 // deletion (up)
                 int upBandJ = j - (i - 1) + bandWidth;
-                if (upBandJ >= 0 && upBandJ < bandSize && prevRow[upBandJ] != Double.MIN_VALUE) {
-                    delete = prevRow[upBandJ] + scoringMatrix.getGapPenalty();
+                if (upBandJ >= 0 && upBandJ < bandSize) {
+                    delete = matrix[i-1][upBandJ] + scoringMatrix.getGapPenalty();
                 }
 
                 // insertion (left)
                 if (j > jStart) {
                     int leftBandJ = (j - 1) - i + bandWidth;
-                    if (leftBandJ >= 0 && leftBandJ < bandSize && currRow[leftBandJ] != Double.MIN_VALUE) {
-                        insert = currRow[leftBandJ] + scoringMatrix.getGapPenalty();
+                    if (leftBandJ >= 0 && leftBandJ < bandSize) {
+                        insert = matrix[i][leftBandJ] + scoringMatrix.getGapPenalty();
                     }
                 }
 
                 // take the maximum score or 0 (Smith-Waterman algorithm)
                 double score = Math.max(0, Math.max(match, Math.max(delete, insert)));
+
                 // store computed score
-                currRow[bandJ] = score;
+                matrix[i][bandJ] = score;
 
                 // track maximum
                 if (score > maxScore) {
@@ -135,10 +141,6 @@ public class BandedAligner extends SequenceAligner {
                     maxJ = j;
                 }
             }
-            // swap arrays for next iteration
-            double[] temp = prevRow;
-            prevRow = currRow;
-            currRow = temp;
         }
 
         // calculate normalized score
