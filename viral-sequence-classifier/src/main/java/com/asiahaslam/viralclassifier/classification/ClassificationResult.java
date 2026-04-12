@@ -81,6 +81,10 @@ public class ClassificationResult {
         return memoryUsedBytes / 1024.0;
     }
 
+    public double getMemoryUsedMB() {
+        return memoryUsedBytes / (1024.0 * 1024.0);
+    }
+
     public String getSequenceId() {
         return sequenceId;
     }
@@ -100,8 +104,8 @@ public class ClassificationResult {
     @Override
     public String toString() {
         return String.format(
-                "ClassificationResult{id='%s', predicted='%s', confidence = %.3f, confident=%s, time=%dms, memory=%.2fKB}",
-                sequenceId, predictedFamily, confidence, isPredictionConfident, processingTimeMs, getMemoryUsedKB()
+                "ClassificationResult{id='%s', predicted='%s', confidence = %.3f, confident=%s, time=%dms, memory=%.2fMB}",
+                sequenceId, predictedFamily, confidence, isPredictionConfident, processingTimeMs, getMemoryUsedMB()
         );
     }
 }

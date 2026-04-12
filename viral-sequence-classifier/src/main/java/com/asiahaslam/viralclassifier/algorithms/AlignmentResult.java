@@ -12,9 +12,10 @@ public class AlignmentResult {
     private final int endPos1;
     private final int endPos2;
     private final int alignmentLength;
+    private final long memoryUsedBytes;
 
     // constructor
-    public AlignmentResult(double alignmentScr, double normalizedScr, String alignedSeq1, String alignedSeq2, int startPs1, int startPs2, int endPs1, int endPs2) {
+    public AlignmentResult(double alignmentScr, double normalizedScr, String alignedSeq1, String alignedSeq2, int startPs1, int startPs2, int endPs1, int endPs2, long memoryUsedBytes) {
         this.alignmentScore = alignmentScr;
         this.normalizedScore = normalizedScr;
         this.alignedSequence1 = alignedSeq1;
@@ -24,11 +25,12 @@ public class AlignmentResult {
         this.endPos1 = endPs1;
         this.endPos2 = endPs2;
         this.alignmentLength = alignedSequence1.length();
+        this.memoryUsedBytes = memoryUsedBytes;
     }
 
     // basic constructor for development purposes (uses only scores)
     public AlignmentResult(double alignmentScr, double normalizedScr) {
-        this(alignmentScr, normalizedScr, "", "", 0, 0, 0, 0);
+        this(alignmentScr, normalizedScr, "", "", 0, 0, 0, 0, 0);
     }
 
     //
@@ -46,4 +48,5 @@ public class AlignmentResult {
     public int getEndPos1() { return endPos1; }
     public int getEndPos2() { return endPos2; }
     public int getAlignmentLength() { return alignmentLength; }
+    public long getMemoryUsedBytes() { return memoryUsedBytes; }
 }

@@ -59,9 +59,42 @@ public class BandedAligner extends SequenceAligner {
             return new AlignmentResult(0.0, 0.0);
         }
 
-        sequence1 = sequence1.toUpperCase();
-        sequence2 = sequence2.toUpperCase();
+        String finalSequence1 = sequence1.toUpperCase();
+        String finalSequence2 = sequence2.toUpperCase();
 
+        final AlignmentResultData resultData = new AlignmentResultData();
+
+        long memoryUsed = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
+            performBandedAlignment(finalSequence1, finalSequence2, resultData);
+        });
+
+        // calculate normalized score
+        double maxPossible = scoringMatrix.getMaxPossibleScore(sequence1, sequence2);
+        double normalizedScore = (maxPossible > 0) ? resultData.maxScore / maxPossible : 0.0;
+
+        // simplified result (cannot do traceback with this implementation)
+        return new AlignmentResult(
+                resultData.maxScore,
+                normalizedScore,
+                "", // no full alignment so no alignedSeq1
+                "", // no full alignment so no alignedSeq2
+                0,
+                0,
+                resultData.maxI - 1,
+                resultData.maxJ - 1,
+                memoryUsed
+        );
+    }
+
+    // helper class to hold results from lambda
+    private static class AlignmentResultData {
+        double maxScore = 0.0;
+        int maxI = 0;
+        int maxJ = 0;
+    }
+
+    // core algorithm logic separated for memory measurement
+    private void performBandedAlignment(String sequence1, String sequence2, AlignmentResultData result) {
         int m = sequence1.length();
         int n = sequence2.length();
 
@@ -70,19 +103,14 @@ public class BandedAligner extends SequenceAligner {
         double[] prevDiagonal = new double[bandSize];
         double[] currDiagonal = new double[bandSize];
 
-
         // initialize the matrix
-        Arrays.fill(prevDiagonal, Double.MIN_VALUE);
-        Arrays.fill(currDiagonal, Double.MIN_VALUE);
+        Arrays.fill(prevDiagonal, -1);
+        Arrays.fill(currDiagonal, -1);
         prevDiagonal[bandWidth] = 0.0; // center of band is [0,0]
-
-        double maxScore = 0.0;
-        int maxI = 0;
-        int maxJ = 0;
 
         // fill in the banded matrix
         for (int i = 1; i <= m; i++) {
-            Arrays.fill(currDiagonal, Double.MIN_VALUE);
+            Arrays.fill(currDiagonal, -1);
 
             int jStart = Math.max(1, i - bandWidth);
             int jEnd = Math.min(n, i + bandWidth);
@@ -99,26 +127,26 @@ public class BandedAligner extends SequenceAligner {
                 char char1 = sequence1.charAt(i - 1);
                 char char2 = sequence2.charAt(j - 1);
 
-                double match = Double.MIN_VALUE;
-                double delete = Double.MIN_VALUE;
-                double insert = Double.MIN_VALUE;
+                double match = -1;
+                double delete = -1;
+                double insert = -1;
 
                 // match/mismatch (diagonal)
                 int prevBandJ = (j - 1) - (i - 1) + bandWidth;
-                if (prevBandJ >= 0 && prevBandJ < bandSize && prevDiagonal[prevBandJ] != Double.MIN_VALUE) {
+                if (prevBandJ >= 0 && prevBandJ < bandSize && prevDiagonal[prevBandJ] != -1) {
                     match = prevDiagonal[prevBandJ] + scoringMatrix.getScore(char1, char2);
                 }
 
                 // deletion (up)
                 int upBandJ = j - (i - 1) + bandWidth;
-                if (upBandJ >= 0 && upBandJ < bandSize && prevDiagonal[upBandJ] != Double.MIN_VALUE) {
+                if (upBandJ >= 0 && upBandJ < bandSize && prevDiagonal[upBandJ] != -1) {
                     delete = prevDiagonal[upBandJ] + scoringMatrix.getGapPenalty();
                 }
 
                 // insertion (left)
                 if (j > jStart) {
                     int leftBandJ = (j - 1) - i + bandWidth;
-                    if (leftBandJ >= 0 && leftBandJ < bandSize && currDiagonal[leftBandJ] != Double.MIN_VALUE) {
+                    if (leftBandJ >= 0 && leftBandJ < bandSize && currDiagonal[leftBandJ] != -1) {
                         insert = currDiagonal[leftBandJ] + scoringMatrix.getGapPenalty();
                     }
                 }
@@ -130,10 +158,10 @@ public class BandedAligner extends SequenceAligner {
                 currDiagonal[bandJ] = score;
 
                 // track maximum
-                if (score > maxScore) {
-                    maxScore = score;
-                    maxI = i;
-                    maxJ = j;
+                if (score > result.maxScore) {
+                    result.maxScore = score;
+                    result.maxI = i;
+                    result.maxJ = j;
                 }
             }
             // swap diagonals
@@ -141,22 +169,6 @@ public class BandedAligner extends SequenceAligner {
             prevDiagonal = currDiagonal;
             currDiagonal = temp;
         }
-
-        // calculate normalized score
-        double maxPossible = scoringMatrix.getMaxPossibleScore(sequence1, sequence2);
-        double normalizedScore = (maxPossible > 0) ? maxScore / maxPossible : 0.0;
-
-        // simplified result (it would be very complex to do traceback in banded matrix)
-        return new AlignmentResult(
-                maxScore,
-                normalizedScore,
-                "", // no full alignment so no alignedSeq1
-                "", // no full alignment so no alignedSeq2
-                0,
-                0,
-                maxI - 1,
-                maxJ - 1
-        );
     }
 
     public int getBandWidth() {

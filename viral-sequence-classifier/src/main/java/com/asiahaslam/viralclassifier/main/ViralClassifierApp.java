@@ -18,11 +18,17 @@ public class ViralClassifierApp {
         // TEST 3: test smith-waterman aligner
         testSWAligner();
 
+        // TEST 3.5: test banded aligner with large sequence
+        testBandedAligner();
+
         // TEST 4: test the class that holds the result of the viral classification
         testClassificationResult();
 
         // TEST 5: test the class that classifies the unknown viral sequence
         testViralClassifier();*/
+
+        // Run test classification
+        runTestClassification();
 
         // Run application
         runClassification();
@@ -37,13 +43,13 @@ public class ViralClassifierApp {
 
             // step 2: create classifier
             ViralClassifier smithWatermanClassifier = new ViralClassifier(
-                    new SpaceOptimizedAligner(), database, 0.70, 10
+                    new SmithWatermanAligner(), database, 0.70, 10
             );
             ViralClassifier bandedClassifier = new ViralClassifier(
                     new BandedAligner(), database, 0.70, 10
             );
             ViralClassifier spaceOptimizedClassifier = new ViralClassifier(
-                    new SmithWatermanAligner(), database, 0.70, 10
+                    new SpaceOptimizedAligner(), database, 0.70, 10
             );
 
             // step 3: load unknown sequence to classify
@@ -133,6 +139,7 @@ public class ViralClassifierApp {
         return database;
     }
 
+
     // load unknown sequence to classify
     private static ViralSequence loadUnknownSequence() throws IOException {
         try {
@@ -151,6 +158,75 @@ public class ViralClassifierApp {
     }
 
 
+    // main workflow for application
+    static void runTestClassification() {
+        System.out.println("\n\nRUNNING TEST VIRAL CLASSIFICATION. . .");
+            // step 1: load reference sequences
+            Map<String, List<ViralSequence>> testDatabase = loadTestDatabase();
+
+            // step 2: create classifiers
+            ViralClassifier testBandedClassifier = new ViralClassifier(
+                    new BandedAligner(), testDatabase, 0.70, 10
+            );
+            ViralClassifier testSpaceOptimizedClassifier = new ViralClassifier(
+                    new SpaceOptimizedAligner(), testDatabase, 0.70, 10
+            );
+            ViralClassifier testSmithWatermanClassifier = new ViralClassifier(
+                    new SmithWatermanAligner(), testDatabase, 0.70, 10
+            );
+
+            // step 3: load unknown sequence to classify
+            String testString = "A".repeat(10000);
+            ViralSequence testSequence = new ViralSequence("test", testString, "testing");
+
+            // step 4: classify sequence
+            ClassificationResult smithWatermanResults = testSmithWatermanClassifier.classify(testSequence);
+            ClassificationResult bandedResults = testBandedClassifier.classify(testSequence);
+            ClassificationResult spaceOptimizedResults = testSpaceOptimizedClassifier.classify(testSequence);
+
+            // step 5: display results
+            displayResults(smithWatermanResults, "Smith-Waterman");
+            displayResults(bandedResults, "Banded Smith-Waterman");
+            displayResults(spaceOptimizedResults, "Space-Optimized Smith-Waterman");
+    }
+
+
+    // loads test database
+    private static Map<String, List<ViralSequence>> loadTestDatabase() {
+        Map<String, List<ViralSequence>> database = new HashMap<>();
+
+        String longSeq1 = "A".repeat(10000);
+        String longSeq2 = "T".repeat(10000);
+        String longSeq3 = "C".repeat(10000);
+        String longSeq4 = "G".repeat(10000);
+
+        ViralSequence test1 = new ViralSequence("test", longSeq1, "testing");
+        ViralSequence test2 = new ViralSequence("test", longSeq2, "testing");
+        ViralSequence test3 = new ViralSequence("test", longSeq3, "testing");
+        ViralSequence test4 = new ViralSequence("test", longSeq4, "testing");
+
+        List<ViralSequence> testSeqs = new ArrayList<>();
+        testSeqs.add(test1);
+        testSeqs.add(test2);
+        testSeqs.add(test3);
+        testSeqs.add(test4);
+        testSeqs.add(test1);
+        testSeqs.add(test2);
+        testSeqs.add(test3);
+        testSeqs.add(test4);
+
+        database.put("Test seqs 1", testSeqs);
+        database.put("Test seqs 2", testSeqs);
+        database.put("Test seqs 3", testSeqs);
+        database.put("Test seqs 4", testSeqs);
+        System.out.println("Loaded " + testSeqs.size() + " Test sequences");
+
+        return database;
+    }
+
+
+
+/*
     // TEST 1: FASTA parser
     static void testFastaParser() {
         System.out.println("Testing FASTA parser:\n");
@@ -209,6 +285,12 @@ public class ViralClassifierApp {
         AlignmentResult result4 = aligner.align("AAAA", "TTTT");
         System.out.println("No similarity test: ");
         System.out.println(result4.getFormattedAlignment());
+    }
+
+    // TEST 3.5: Banded aligner
+    static void testBandedAligner() {
+        System.out.println("Testing Banded Aligner:\n");
+        BandedAligner aligner = new BandedAligner();
     }
 
     // TEST 4: Classification result
@@ -278,5 +360,5 @@ public class ViralClassifierApp {
 
         // create classifier instance
         return new ViralClassifier(database);
-    }
+    }*/
 }

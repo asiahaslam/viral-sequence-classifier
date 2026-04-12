@@ -5,7 +5,13 @@ import com.asiahaslam.viralclassifier.algorithms.SmithWatermanAligner;
 import com.asiahaslam.viralclassifier.algorithms.AlignmentResult;
 import com.asiahaslam.viralclassifier.sequences.ViralSequence;
 
+import com.sun.management.ThreadMXBean;
+import java.lang.management.ManagementFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.LongSupplier;
 
 // this class classifies unknown sequences using Smith-Waterman alignment
 // it compares the new sequence against a reference database to predict likely virus family
@@ -14,6 +20,7 @@ public class ViralClassifier {
     private final Map<String, List<ViralSequence>> referenceDatabase;
     private final double confidenceThreshold;
     private final int maxReferencesPerFamily;
+    private long totalMemoryUsed;
 
     // constructor with default parameters
     public ViralClassifier(Map<String, List<ViralSequence>> referenceDatabase) {
@@ -21,6 +28,7 @@ public class ViralClassifier {
         this.referenceDatabase = new HashMap<>(referenceDatabase);
         this.confidenceThreshold = 0.70; // default is 70% similarity
         this.maxReferencesPerFamily = 5; // limit to 5 references to improve performance
+        this.totalMemoryUsed = 0;
     }
 
     /**
@@ -36,6 +44,7 @@ public class ViralClassifier {
         this.referenceDatabase = referenceDatabase;
         this.confidenceThreshold = confidenceThreshold;
         this.maxReferencesPerFamily = maxReferencesPerFamily;
+        this.totalMemoryUsed = 0;
     }
 
     /**
@@ -46,27 +55,48 @@ public class ViralClassifier {
     public ClassificationResult classify(ViralSequence unknownSequence) {
         long startTime = System.currentTimeMillis(); // for calculating processing time
 
-        // measure memory before classification
+       /*// measure memory before classification
         Runtime runtime = Runtime.getRuntime();
         for (int i = 0; i < 5; i++) {
             runtime.gc(); // suggest garbage collection to make measurement more accurate
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
 
-        long memoryBefore = runtime.totalMemory() - runtime.freeMemory();
+        long memoryBefore = runtime.totalMemory() - runtime.freeMemory();*/
+
+        /*long memoryUsed = 0;
+        long beforeBytes = 0;
+        long threadId = 0;
+
+        ThreadMXBean threadBean = (ThreadMXBean) ManagementFactory.getThreadMXBean();*/
+
+        /*if (threadBean.isThreadAllocatedMemorySupported()) {
+            threadId = Thread.currentThread().threadId();
+
+            // Warm up and clear
+            System.gc();
+            Thread.yield();
+
+            beforeBytes = threadBean.getThreadAllocatedBytes(threadId);
+        }*/
+        // else not supported on this JVM
 
 
         // validate input
         // if no sequence, use createUnknown to create an unknown viral sequence
         if (unknownSequence == null || unknownSequence.getSequence().isEmpty()) {
-            long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
-            long memoryUsed = Math.max(0, memoryAfter - memoryBefore);
+            /*long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
+            long memoryUsed = Math.max(0, memoryAfter - memoryBefore);*/
+            /*if (threadBean.isThreadAllocatedMemorySupported()) {
+                long afterBytes = threadBean.getThreadAllocatedBytes(threadId);
+                memoryUsed = Math.max(0, afterBytes - beforeBytes);
+            }*/
             return ClassificationResult.createUnknown(
                     unknownSequence != null ? unknownSequence.getName() : "null",
                     new HashMap<>(),
                     aligner.getAlgorithmName(),
                     System.currentTimeMillis() - startTime,
-                    memoryUsed
+                    0
                     );
         }
 
@@ -81,13 +111,18 @@ public class ViralClassifier {
         boolean isConfident = bestScore >= confidenceThreshold;
         String finalPrediction = isConfident ? bestFamily : "Unknown";
 
-        // measure memory after classification
+        /*// measure memory after classification
         for (int i = 0; i < 5; i++) {
             runtime.gc(); // suggest garbage collection to make measurement more accurate
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
         long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
-        long memoryUsed = Math.max(0, memoryAfter - memoryBefore);
+        long memoryUsed = Math.max(0, memoryAfter - memoryBefore);*/
+
+        /*if (threadBean.isThreadAllocatedMemorySupported()) {
+            long afterBytes = threadBean.getThreadAllocatedBytes(threadId);
+            memoryUsed = Math.max(0, afterBytes - beforeBytes);
+        }*/
 
         // calculate time it took to process
         long processingTime = System.currentTimeMillis() - startTime;
@@ -100,9 +135,39 @@ public class ViralClassifier {
                 familyScores,
                 aligner.getAlgorithmName(),
                 processingTime,
-                memoryUsed
+                totalMemoryUsed
         );
     }
+
+    /*private static LongSupplier initAllocatedMemoryProvider() {
+        try {
+            Class<?> internalIntf = Class.forName("com.sun.management.ThreadMXBean");
+            ThreadMXBean bean = (ThreadMXBean) ManagementFactory.getThreadMXBean();
+            if (!internalIntf.isAssignableFrom(bean.getClass())) {
+                // Attempts to get the interface from PlatformMXBean
+                // Class<?> pmo = Class.forName("java.lang.management.PlatformManagedObject");
+                Method m = ManagementFactory.class.getMethod("getPlatformMXBean", Class.class);
+                *//*Method m = ManagementFactory.class.getMethod("getPlatformMXBean", Class.class, pmo);*//*
+                bean = (ThreadMXBean) m.invoke(null, internalIntf);
+                if (bean == null) {
+                    throw new UnsupportedOperationException("No way to access private ThreadMXBean");
+                }
+            }
+
+            ThreadMXBean allocMxBean = bean;
+            Method allocMxBeanGetter = internalIntf.getMethod("getCurrentThreadAllocatedBytes");
+
+            return () -> {
+                try {
+                    return (long)allocMxBeanGetter.invoke(allocMxBean);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+        } catch (Exception e) {
+            return () -> 0;
+        }
+    }*/
 
     // calculate alignment scores for each virus family
 
@@ -155,6 +220,8 @@ public class ViralClassifier {
 
                 double normalizedScore = result.getNormalizedScore();
                 bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
+                totalMemoryUsed += result.getMemoryUsedBytes();
+                System.out.println("Memory (bytes) used for classifying " + reference.getVirusFamily() + " with " + aligner.getAlgorithmName() + " number " + (i + 1) + ": " + result.getMemoryUsedBytes());
             }
 
             catch (Exception e) {

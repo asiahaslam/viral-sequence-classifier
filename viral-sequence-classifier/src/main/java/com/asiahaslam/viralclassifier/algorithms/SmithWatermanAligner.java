@@ -18,6 +18,7 @@ package com.asiahaslam.viralclassifier.algorithms;
  * O(mn) time and space
  */
 public class SmithWatermanAligner extends SequenceAligner {
+
     // this constructor uses the default scoring matrix
     public SmithWatermanAligner() {
         super();
@@ -50,33 +51,74 @@ public class SmithWatermanAligner extends SequenceAligner {
         }
 
         // convert sequences to uppercase
-        sequence1 = sequence1.toUpperCase();
-        sequence2 = sequence2.toUpperCase();
+        String finalSequence1 = sequence1.toUpperCase();
+        String finalSequence2 = sequence2.toUpperCase();
 
-        // create scoring matrix
-        double[][] scoreMatrix = createScoringMatrix(sequence1, sequence2);
+        // store results to capture from lambda
+        final AlignmentResultData resultData = new AlignmentResultData();
 
-        // find position of max score
-        MaxScorePosition maxPos = findMaxScore(scoreMatrix);
+        /*// test the memory measurement itself
+        long testMemory = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
+            // Allocate something we know the size of
+            double[] testArray = new double[1000]; // Should be 8000 bytes
+            for (int i = 0; i < testArray.length; i++) {
+                testArray[i] = i; // Force actual allocation
+            }
+        });
+        System.out.println("Test allocation: " + testMemory + " bytes (should be ~8000)");*/
+
+        // measure memory of just the core algorithm
+        long memoryUsed = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
+            performSmithWatermanAlignment(finalSequence1, finalSequence2, resultData);
+        });
 
         // calculate normalized score
         double maxPossible = scoringMatrix.getMaxPossibleScore(sequence1, sequence2);
-        double normalizedScore = (maxPossible > 0) ? maxPos.score / maxPossible : 0.0;
+        double normalizedScore = (maxPossible > 0) ? resultData.alignmentScore / maxPossible : 0.0;
+
+        return new AlignmentResult(
+                resultData.alignmentScore,
+                normalizedScore,
+                resultData.alignedSequence1,
+                resultData.alignedSequence2,
+                resultData.startPos1,
+                resultData.startPos2,
+                resultData.endPos1,
+                resultData.endPos2,
+                memoryUsed
+        );
+    }
+
+    private void performSmithWatermanAlignment(String sequence1, String sequence2, AlignmentResultData result) {
+        // create the scoring matrix
+        double[][] scoreMatrix = createScoringMatrix(sequence1, sequence2);
+
+        // find the highest score in the matrix
+        MaxScorePosition maxPos = findMaxScore(scoreMatrix);
+        result.alignmentScore = maxPos.score;
 
         // traceback to find the best alignment of the 2 sequences
         // this will give us all the other information we need in addition to the max score and normalized score
-        AlignmentResult result = traceback(scoreMatrix, sequence1, sequence2, maxPos);
+        AlignmentData tracebackResult = traceback(scoreMatrix, sequence1, sequence2, maxPos);
+        result.alignedSequence1 = tracebackResult.alignedSequence1;
+        result.alignedSequence2 = tracebackResult.alignedSequence2;
+        result.startPos1 = tracebackResult.startPos1;
+        result.startPos2 = tracebackResult.startPos2;
+        result.endPos1 = tracebackResult.endPos1;
+        result.endPos2 = tracebackResult.endPos2;
+    }
 
-        return new AlignmentResult(
-                maxPos.score,
-                normalizedScore,
-                result.getAlignedSequence1(),
-                result.getAlignedSequence2(),
-                result.getStartPos1(),
-                result.getStartPos2(),
-                result.getEndPos1(),
-                result.getEndPos2()
-        );
+    /**
+     * Helper class to capture results from the lambda
+     */
+    private static class AlignmentResultData {
+        double alignmentScore = 0.0;
+        String alignedSequence1 = "";
+        String alignedSequence2 = "";
+        int startPos1 = 0;
+        int startPos2 = 0;
+        int endPos1 = 0;
+        int endPos2 = 0;
     }
 
     private double[][] createScoringMatrix(String seq1, String seq2) {
@@ -133,9 +175,9 @@ public class SmithWatermanAligner extends SequenceAligner {
 
     // helper class to store the position of the max value in the matrix
     private static class MaxScorePosition {
-        final double score;
-        final int row;
-        final int col;
+        double score;
+        int row;
+        int col;
 
         MaxScorePosition(double score1, int row1, int col1) {
             this.score = score1;
@@ -145,7 +187,7 @@ public class SmithWatermanAligner extends SequenceAligner {
     }
 
     // traceback to construct the optimal alignment of the 2 sequences
-    private AlignmentResult traceback(double[][] matrix, String seq1, String seq2, MaxScorePosition maxPos) {
+    private AlignmentData traceback(double[][] matrix, String seq1, String seq2, MaxScorePosition maxPos) {
         StringBuilder alignedSeq1 = new StringBuilder();
         StringBuilder alignedSeq2 = new StringBuilder();
 
@@ -207,8 +249,7 @@ public class SmithWatermanAligner extends SequenceAligner {
         int startPos1 = i;
         int startPos2 = j;
 
-        return new AlignmentResult(
-                0, 0, // we set the scores in AlignmentResult after we call this method
+        return new AlignmentData(
                 alignedSeq1.toString(),
                 alignedSeq2.toString(),
                 startPos1,
@@ -216,5 +257,10 @@ public class SmithWatermanAligner extends SequenceAligner {
                 endPos1,
                 endPos2
         );
+    }
+
+    // helper class for traceback results
+        private record AlignmentData(String alignedSequence1, String alignedSequence2, int startPos1, int startPos2,
+                                     int endPos1, int endPos2) {
     }
 }
