@@ -1,4 +1,4 @@
-package com.asiahaslam.viralclassifier.algorithms;
+package com.asiahaslam.viralclassifier.utils;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
