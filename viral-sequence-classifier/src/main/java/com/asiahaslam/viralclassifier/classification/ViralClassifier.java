@@ -5,6 +5,7 @@ import com.asiahaslam.viralclassifier.algorithms.SmithWatermanAligner;
 import com.asiahaslam.viralclassifier.algorithms.AlignmentResult;
 import com.asiahaslam.viralclassifier.sequences.ViralSequence;
 
+import javax.swing.*;
 import java.util.*;
 
 // this class classifies unknown sequences using Smith-Waterman alignment
@@ -15,6 +16,7 @@ public class ViralClassifier {
     private final double confidenceThreshold;
     private final int maxReferencesPerFamily;
     private long totalMemoryUsed;
+    private AlignmentResult topAlignment;
 
     // constructor with default parameters
     public ViralClassifier(Map<String, List<ViralSequence>> referenceDatabase) {
@@ -23,6 +25,7 @@ public class ViralClassifier {
         this.confidenceThreshold = 0.70; // default is 70% similarity
         this.maxReferencesPerFamily = 5; // limit to 5 references to improve performance
         this.totalMemoryUsed = 0;
+        this.topAlignment = new AlignmentResult(0.0, 0.0);
     }
 
     /**
@@ -39,6 +42,7 @@ public class ViralClassifier {
         this.confidenceThreshold = confidenceThreshold;
         this.maxReferencesPerFamily = maxReferencesPerFamily;
         this.totalMemoryUsed = 0;
+        this.topAlignment = new AlignmentResult(0.0, 0.0);
     }
 
     /**
@@ -122,6 +126,7 @@ public class ViralClassifier {
         // sort references by length because a longer sequence is likely to have better alignment
         List<ViralSequence> sortedReferences = new ArrayList<>(referenceSequences);
         sortedReferences.sort((a, b) -> Integer.compare(b.getLength(), a.getLength()));
+        AlignmentResult result = new AlignmentResult(0.0, 0.0);
 
         // now go through the sequences to find the best match
         for (int i = 0; i < sequencesToCheck; i++) {
@@ -129,7 +134,7 @@ public class ViralClassifier {
 
             try {
                 // try to align the unknown sequence with the current sequence to compare in this family
-                AlignmentResult result = aligner.align(
+                result = aligner.align(
                         unknownSequence.getSequence(),
                         reference.getSequence()
                 );
@@ -137,7 +142,8 @@ public class ViralClassifier {
                 double normalizedScore = result.getNormalizedScore();
                 bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
                 totalMemoryUsed += result.getMemoryUsedBytes();
-                System.out.println("Memory (bytes) used for classifying " + reference.getVirusFamily() + " with " + aligner.getAlgorithmName() + " number " + (i + 1) + ": " + result.getMemoryUsedBytes());
+                // for logging memory use
+                // System.out.println("Memory (bytes) used for classifying " + reference.getVirusFamily() + " with " + aligner.getAlgorithmName() + " number " + (i + 1) + ": " + result.getMemoryUsedBytes());
             }
 
             catch (Exception e) {
@@ -147,6 +153,7 @@ public class ViralClassifier {
                 );
             }
         }
+        topAlignment = result;
         return bestScore;
     }
 
@@ -163,7 +170,7 @@ public class ViralClassifier {
     public double getConfidenceThreshold() { return confidenceThreshold; }
     public int getMaxReferencesPerFamily() { return maxReferencesPerFamily; }
     public SequenceAligner getAligner() { return aligner; }
-
+    public AlignmentResult getTopAlignment() { return topAlignment; }
 }
 
 

@@ -37,7 +37,7 @@ public class ClassificationResultTest {
                 "test2", "Influenza", 0.85, true, familyScores, "TestAlg", 100L, 1024L
         );
 
-        assertEquals("Coronavirus", result.getSecondBestFamily());
+        assertEquals("Coronavirus", result.getSecondBestFamily().getSecondBest());
     }
 
     @Test

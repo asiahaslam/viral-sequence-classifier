@@ -36,48 +36,51 @@ public class CommandLineParser {
         private final String sequenceInput;
         private final boolean isFile;
         private final boolean showSecondFamily;
-        private final boolean showMaxScoreInfo;
         private final boolean showAlignedSequences;
-        private final List<AlgorithmType> algorithms;
+        private final AlgorithmType algType;
         private final boolean showPerformanceData;
         private final int bandWidth;
+        private final double confidenceThreshold;
+        private final boolean showMaxScore;
 
         public ParsedArguments() {
             this.showHelp = true;
             this.sequenceInput = null;
             this.isFile = false;
             this.showSecondFamily = false;
-            this.showMaxScoreInfo = false;
             this.showAlignedSequences = false;
-            this.algorithms = new ArrayList<>();
+            this.algType = AlgorithmType.STANDARD;
             this.showPerformanceData = false;
             this.bandWidth = 20;
+            this.confidenceThreshold = 0.70;
+            this.showMaxScore = false;
         }
 
         public ParsedArguments(
                 boolean showHelp, String sequenceInput, boolean isFile,
-                boolean showSecondFamily, boolean showMaxScoreInfo, boolean showAlignedSequences,
-                List<AlgorithmType> algorithms, boolean showPerformanceData, int bandWidth) {
+                boolean showSecondFamily, boolean showAlignedSequences, AlgorithmType algType, boolean showPerformanceData, int bandWidth, double confidenceThreshold, boolean showMaxScore) {
             this.showHelp = showHelp;
             this.sequenceInput = sequenceInput;
             this.isFile = isFile;
             this.showSecondFamily = showSecondFamily;
-            this.showMaxScoreInfo = showMaxScoreInfo;
             this.showAlignedSequences = showAlignedSequences;
-            this.algorithms = algorithms;
+            this.algType = algType;
             this.showPerformanceData = showPerformanceData;
             this.bandWidth = bandWidth;
+            this.confidenceThreshold = confidenceThreshold;
+            this.showMaxScore = showMaxScore;
         }
 
         public boolean shouldShowHelp() { return showHelp; }
         public String getSequenceInput() { return sequenceInput; }
         public boolean isFile() { return isFile; }
         public boolean shouldShowSecondFamily() { return showSecondFamily; }
-        public boolean shouldShowScoreInfo() { return showMaxScoreInfo; }
         public boolean shouldShowAlignedSequences() { return showAlignedSequences; }
-        public List<AlgorithmType> getAlgorithms() { return algorithms; }
+        public AlgorithmType getAlgorithm() { return algType; }
         public boolean shouldShowPerformanceData () { return showPerformanceData; }
+        public double getConfidenceThreshold() { return confidenceThreshold; }
         public int getBandWidth() { return bandWidth; }
+        public boolean shouldShowMaxScore() { return showMaxScore; }
     }
 
     public static void printHelp() {
@@ -110,8 +113,10 @@ public class CommandLineParser {
         System.out.println("  -m, --max-score     Show max score info");
         System.out.println("  -a, --alignment     Show sequence alignment for top sequence(es)");
         System.out.println("  -p, --performance     Show algorithm performance (speed and memory)");
+        System.out.println("  -c, --confidence     Provide custom confidence threshold (0.5 to 1.0)");
         System.out.println();
 
+        // TODO: add examples in help menu
         System.out.println("EXAMPLES:");
         System.out.println();
         System.out.println();
@@ -137,11 +142,13 @@ public class CommandLineParser {
         String sequenceInput = null;
         boolean isFile = false;
         boolean showSecondFamily = false;
-        boolean showMaxScoreInfo = false;
         boolean showAlignedSequences = false;
-        List<AlgorithmType> algorithms = new ArrayList<>();
+        // List<AlgorithmType> algorithms = new ArrayList<>();
+        AlgorithmType algType = AlgorithmType.STANDARD;
         boolean showPerformanceData = false;
         int bandWidth = 20;
+        double confidenceThreshold = 0.70;
+        boolean showMaxScore = false;
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -179,23 +186,12 @@ public class CommandLineParser {
                         break;
                     }
                     String algFlag = args[++i];
-                    AlgorithmType algType = AlgorithmType.fromFlag(algFlag);
+                    algType = AlgorithmType.fromFlag(algFlag);
                     if (algType == null) {
                         System.err.println("Error: Unknown algorithm " + algFlag);
                         System.err.println("Valid options: standard, space, banded, all");
                         showHelp = true;
                         break;
-                    }
-                    if (algType == AlgorithmType.ALL) {
-                        algorithms.clear();
-                        algorithms.addAll(Arrays.asList(
-                                AlgorithmType.STANDARD,
-                                AlgorithmType.SPACE_OPTIMIZED,
-                                AlgorithmType.BANDED
-                        ));
-                    }
-                    else {
-                        algorithms.add(algType);
                     }
                     break;
                 case "-b":
@@ -213,17 +209,13 @@ public class CommandLineParser {
                         }
                     }
                     catch (NumberFormatException e) {
-                        System.err.println("Error: Invalid band width " + args[i]);
+                        System.err.println("Error: Invalid band width " + args[++i]);
                         showHelp = true;
                     }
                     break;
                 case "-t":
                 case "--two-families":
                     showSecondFamily = true;
-                    break;
-                case "-m":
-                case "--max-score":
-                    showMaxScoreInfo = true;
                     break;
                 case "-a":
                 case "--alignment":
@@ -233,16 +225,35 @@ public class CommandLineParser {
                 case "--performance":
                     showPerformanceData = true;
                     break;
+                case "-m":
+                case "--max-score":
+                    showMaxScore = true;
+                    break;
+                case "-c":
+                case "--confidence":
+                    if (i + 1 >= args.length) {
+                        System.err.println("Error: -c/--confidence requires a number");
+                        showHelp = true;
+                        break;
+                    }
+                    try {
+                        confidenceThreshold = Double.parseDouble(args[++i]);
+                        if (confidenceThreshold < 0.5 || confidenceThreshold > 1.0) {
+                            System.err.println("Error: Confidence threshold must be between 0.5 and 1.0 inclusive");
+                            showHelp = true;
+                        }
+                    }
+                    catch (NumberFormatException e) {
+                        System.err.println("Error: Invalid confidence threshold " + args[++i]);
+                        showHelp = true;
+                    }
+                    break;
                 default:
                     System.err.println("Error: Unknown option " + arg);
                     showHelp = true;
                     break;
 
             }
-        }
-        // if no algorithms specified, do standard smith-waterman
-        if (algorithms. isEmpty() && !showHelp) {
-            algorithms.add(AlgorithmType.STANDARD);
         }
 
         // make sure there is a sequence to classify
@@ -253,7 +264,6 @@ public class CommandLineParser {
 
         return new ParsedArguments(
                 showHelp, sequenceInput, isFile,
-                showSecondFamily, showMaxScoreInfo, showAlignedSequences,
-                algorithms, showPerformanceData, bandWidth);
+                showSecondFamily, showAlignedSequences, algType, showPerformanceData, bandWidth, confidenceThreshold, showMaxScore);
     }
 }

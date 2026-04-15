@@ -42,8 +42,21 @@ public class ClassificationResult {
                 allFamilyScores, algorithmUsed, processingTimeMs, memoryUsedBytes);
     }
 
+    public static class SecondBestFamily {
+        public final String secondBest;
+        public double secondBestScore;
+
+        public SecondBestFamily(String secondBest, double secondBestScore) {
+            this.secondBest = secondBest;
+            this.secondBestScore = secondBestScore;
+        }
+
+        public String getSecondBest() { return secondBest; }
+        public double getSecondBestScore() { return secondBestScore; }
+    }
+
     // find virus family with the second-highest score
-    public String getSecondBestFamily() {
+    public SecondBestFamily getSecondBestFamily() {
         String best = null;
         String secondBest = null;
         double bestScore = -1;
@@ -62,7 +75,7 @@ public class ClassificationResult {
             }
         }
 
-        return secondBest;
+        return new SecondBestFamily(secondBest, secondBestScore);
     }
 
     public String getAlgorithmUsed() {
