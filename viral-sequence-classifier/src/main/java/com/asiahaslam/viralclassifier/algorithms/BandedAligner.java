@@ -1,5 +1,7 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
+import com.asiahaslam.viralclassifier.utils.AccurateMemoryMeasurement;
+
 import java.util.Arrays;
 
 /**
@@ -98,7 +100,7 @@ public class BandedAligner extends SequenceAligner {
         int m = sequence1.length();
         int n = sequence2.length();
 
-        // just store the band as a 1-dimensional array
+        // just store two rows of the band at a time
         int bandSize = 2 * bandWidth + 1;
         double[] prevDiagonal = new double[bandSize];
         double[] currDiagonal = new double[bandSize];

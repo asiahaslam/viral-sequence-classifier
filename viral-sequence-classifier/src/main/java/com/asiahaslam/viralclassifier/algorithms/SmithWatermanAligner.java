@@ -12,6 +12,8 @@ package com.asiahaslam.viralclassifier.algorithms;
  * starting with the position of the max score.
  */
 
+import com.asiahaslam.viralclassifier.utils.AccurateMemoryMeasurement;
+
 /**
  * standard Smith-Waterman local sequence alignment algorithm
  * uses full dynamic programming matrix

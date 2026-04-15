@@ -1,5 +1,7 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
+import com.asiahaslam.viralclassifier.utils.AccurateMemoryMeasurement;
+
 /**
  * space-optimized Smith-Waterman algorithm
  * uses just two rows instead of the full matrix
