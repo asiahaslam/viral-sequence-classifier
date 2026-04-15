@@ -14,7 +14,6 @@ public class ViralClassifier {
     private final SequenceAligner aligner;
     private final Map<String, List<ViralSequence>> referenceDatabase;
     private final double confidenceThreshold;
-    private final int maxReferencesPerFamily;
     private long totalMemoryUsed;
     private AlignmentResult topAlignment;
 
@@ -23,7 +22,6 @@ public class ViralClassifier {
         this.aligner = new SmithWatermanAligner(); // default to standard algorithm
         this.referenceDatabase = new HashMap<>(referenceDatabase);
         this.confidenceThreshold = 0.70; // default is 70% similarity
-        this.maxReferencesPerFamily = 5; // limit to 5 references to improve performance
         this.totalMemoryUsed = 0;
         this.topAlignment = new AlignmentResult(0.0, 0.0);
     }
@@ -33,14 +31,12 @@ public class ViralClassifier {
      * @param aligner custom smith-waterman aligner
      * @param referenceDatabase map of virus family name to reference sequences
      * @param confidenceThreshold minimum confidence for classification from 0.0 to 1.0
-     * @param maxReferencesPerFamily max reference sequences to check per family
      */
     public ViralClassifier(SequenceAligner aligner, Map<String, List<ViralSequence>> referenceDatabase,
-                           double confidenceThreshold, int maxReferencesPerFamily) {
+                           double confidenceThreshold) {
         this.aligner = aligner;
         this.referenceDatabase = referenceDatabase;
         this.confidenceThreshold = confidenceThreshold;
-        this.maxReferencesPerFamily = maxReferencesPerFamily;
         this.totalMemoryUsed = 0;
         this.topAlignment = new AlignmentResult(0.0, 0.0);
     }
@@ -120,8 +116,8 @@ public class ViralClassifier {
                                                List<ViralSequence> referenceSequences) {
         // variable to hold the current best score in the family
         double bestScore = 0.0;
-        // find the number of sequences to check: either all sequences or the set limit, whichever is smaller
-        int sequencesToCheck = Math.min(referenceSequences.size(), maxReferencesPerFamily);
+        // find the number of sequences to check
+        int sequencesToCheck = referenceSequences.size();
 
         // sort references by length because a longer sequence is likely to have better alignment
         List<ViralSequence> sortedReferences = new ArrayList<>(referenceSequences);
@@ -168,7 +164,6 @@ public class ViralClassifier {
 
     // getters
     public double getConfidenceThreshold() { return confidenceThreshold; }
-    public int getMaxReferencesPerFamily() { return maxReferencesPerFamily; }
     public SequenceAligner getAligner() { return aligner; }
     public AlignmentResult getTopAlignment() { return topAlignment; }
 }

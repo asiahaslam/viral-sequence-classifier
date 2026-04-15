@@ -95,7 +95,7 @@ public class ViralClassifierApp {
         };
 
         // create classifier and run the classification
-        ViralClassifier classifier = new ViralClassifier(aligner, database, args.getConfidenceThreshold(), 10);
+        ViralClassifier classifier = new ViralClassifier(aligner, database, args.getConfidenceThreshold());
         ClassificationResult result = classifier.classify(unknownSequence);
 
         // display results
@@ -138,14 +138,11 @@ public class ViralClassifierApp {
     ) {
         // create classifiers
         ViralClassifier smithWatermanClassifier = new ViralClassifier(
-                new SmithWatermanAligner(), database, args.getConfidenceThreshold(), 10
-        );
+                new SmithWatermanAligner(), database, args.getConfidenceThreshold());
         ViralClassifier bandedClassifier = new ViralClassifier(
-                new BandedAligner(), database, args.getConfidenceThreshold(), 10
-        );
+                new BandedAligner(), database, args.getConfidenceThreshold());
         ViralClassifier spaceOptimizedClassifier = new ViralClassifier(
-                new SpaceOptimizedAligner(), database, args.getConfidenceThreshold(), 10
-        );
+                new SpaceOptimizedAligner(), database, args.getConfidenceThreshold());
 
         // create list of classifiers
         List<ViralClassifier> classifiers = new ArrayList<>();
@@ -210,14 +207,11 @@ public class ViralClassifierApp {
 
             // step 2: create classifier
             ViralClassifier smithWatermanClassifier = new ViralClassifier(
-                    new SmithWatermanAligner(), database, 0.70, 10
-            );
+                    new SmithWatermanAligner(), database, 0.70);
             ViralClassifier bandedClassifier = new ViralClassifier(
-                    new BandedAligner(), database, 0.70, 10
-            );
+                    new BandedAligner(), database, 0.70);
             ViralClassifier spaceOptimizedClassifier = new ViralClassifier(
-                    new SpaceOptimizedAligner(), database, 0.70, 10
-            );
+                    new SpaceOptimizedAligner(), database, 0.70);
 
             // step 3: load unknown sequence to classify
             ViralSequence unknownSequence = loadUnknownSequence();
@@ -315,14 +309,11 @@ public class ViralClassifierApp {
 
         // step 2: create classifiers
         ViralClassifier testBandedClassifier = new ViralClassifier(
-                new BandedAligner(), testDatabase, 0.70, 10
-        );
+                new BandedAligner(), testDatabase, 0.70);
         ViralClassifier testSpaceOptimizedClassifier = new ViralClassifier(
-                new SpaceOptimizedAligner(), testDatabase, 0.70, 10
-        );
+                new SpaceOptimizedAligner(), testDatabase, 0.70);
         ViralClassifier testSmithWatermanClassifier = new ViralClassifier(
-                new SmithWatermanAligner(), testDatabase, 0.70, 10
-        );
+                new SmithWatermanAligner(), testDatabase, 0.70);
 
         // step 3: load unknown sequence to classify
         String testString = "A".repeat(7500);
