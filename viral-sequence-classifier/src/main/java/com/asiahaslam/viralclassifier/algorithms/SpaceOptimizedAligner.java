@@ -1,6 +1,6 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
-import com.asiahaslam.viralclassifier.utils.AccurateMemoryMeasurement;
+import com.asiahaslam.viralclassifier.utils.MemoryMeasurement;
 
 /**
  * space-optimized Smith-Waterman algorithm
@@ -51,7 +51,7 @@ public class SpaceOptimizedAligner extends SequenceAligner {
 
         final AlignmentResultData resultData = new AlignmentResultData();
 
-        long memoryUsed = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
+        long memoryUsed = MemoryMeasurement.measureAllocatedMemory(() -> {
             performSpaceOptimizedAlignment(finalSequence1, finalSequence2, resultData);
         });
 

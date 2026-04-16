@@ -19,28 +19,11 @@ public class ViralClassifierApp {
         else {
             runClassificationWithArgs(parsedArgs);
         }
-        /*// TEST 1: test FASTA file parsing
-        testFastaParser();
 
-        // TEST 2: test scoring
-        testScoring();
-
-        // TEST 3: test smith-waterman aligner
-        testSWAligner();
-
-        // TEST 3.5: test banded aligner with large sequence
-        testBandedAligner();
-
-        // TEST 4: test the class that holds the result of the viral classification
-        testClassificationResult();
-
-        // TEST 5: test the class that classifies the unknown viral sequence
-        testViralClassifier();*/
-
-        // Run test classification
+        // Run test classification (good for performance analysis)
         // runTestClassification();
 
-        // Run application
+        // Run application by automatically pulling from file called unknown.fasta and using all 3 algorithms
         // runClassification();
     }
 

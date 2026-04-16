@@ -12,7 +12,7 @@ package com.asiahaslam.viralclassifier.algorithms;
  * starting with the position of the max score.
  */
 
-import com.asiahaslam.viralclassifier.utils.AccurateMemoryMeasurement;
+import com.asiahaslam.viralclassifier.utils.MemoryMeasurement;
 
 /**
  * standard Smith-Waterman local sequence alignment algorithm
@@ -70,7 +70,7 @@ public class SmithWatermanAligner extends SequenceAligner {
         System.out.println("Test allocation: " + testMemory + " bytes (should be ~8000)");*/
 
         // measure memory of just the core algorithm
-        long memoryUsed = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
+        long memoryUsed = MemoryMeasurement.measureAllocatedMemory(() -> {
             performSmithWatermanAlignment(finalSequence1, finalSequence2, resultData);
         });
 

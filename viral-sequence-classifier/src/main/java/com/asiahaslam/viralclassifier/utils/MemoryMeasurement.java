@@ -10,7 +10,7 @@ import java.util.function.LongSupplier;
     https://github.com/vbochenin/code.vbochenin.github.io/tree/main/memory-usage
  */
 
-public class AccurateMemoryMeasurement {
+public class MemoryMeasurement {
 
     private static final LongSupplier memoryProvider = initAllocatedMemoryProvider();
 

@@ -1,6 +1,6 @@
 package com.asiahaslam.viralclassifier.algorithms;
 
-import com.asiahaslam.viralclassifier.utils.AccurateMemoryMeasurement;
+import com.asiahaslam.viralclassifier.utils.MemoryMeasurement;
 
 import java.util.Arrays;
 
@@ -66,7 +66,7 @@ public class BandedAligner extends SequenceAligner {
 
         final AlignmentResultData resultData = new AlignmentResultData();
 
-        long memoryUsed = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
+        long memoryUsed = MemoryMeasurement.measureAllocatedMemory(() -> {
             performBandedAlignment(finalSequence1, finalSequence2, resultData);
         });
 
