@@ -116,7 +116,7 @@ public class CommandLineParser {
         System.out.println("  -c, --confidence     Provide custom confidence threshold (0.5 to 1.0)");
         System.out.println();
 
-        // TODO: add examples in help menu
+        // examples for user
         System.out.println("EXAMPLES:");
         System.out.println("Read from a FASTA file, show two predictions, algorithm performance data, and max score data");
         System.out.println("-f data/unknown.fasta -a -t -p -m");
