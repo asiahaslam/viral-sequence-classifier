@@ -118,25 +118,20 @@ public class CommandLineParser {
 
         // TODO: add examples in help menu
         System.out.println("EXAMPLES:");
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
+        System.out.println("Read from a FASTA file, show two predictions, algorithm performance data, and max score data");
+        System.out.println("-f data/unknown.fasta -a -t -p -m");
+        System.out.println("Read from a string, use the banded algorithm with band-width = 25");
+        System.out.println("-s AATTGGCCAAG -v banded -b 25");
+        System.out.println("Read from a FASTA file, use 0.85 confidence threshold, use default algorithm");
+        System.out.println("-f data/unknown.fasta -c 0.85");
+        System.out.println("Read from a string, use all algorithm variants, show algorithm performance data");
+        System.out.println("-s AATTGGCCAAG -v all -p");
     }
 
     public static ParsedArguments parsedArguments(String[] args) {
         if (args.length == 0) {
             return new ParsedArguments();
         }
-
-        // TODO: add interactive mode?
 
         boolean showHelp = false;
         String sequenceInput = null;
