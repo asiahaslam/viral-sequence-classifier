@@ -11,7 +11,7 @@ import java.util.*;
 public class ViralClassifierApp {
     static void main(String[] args) {
         CommandLineParser.ParsedArguments parsedArgs = CommandLineParser.parsedArguments(args);
-        System.out.println("Arguments received: " + Arrays.toString(args));
+        System.out.println("\nArguments received: " + Arrays.toString(args) + "\n");
 
         if (parsedArgs.shouldShowHelp()) {
             CommandLineParser.printHelp();
@@ -31,6 +31,7 @@ public class ViralClassifierApp {
     private static void runClassificationWithArgs(CommandLineParser.ParsedArguments args) {
         try {
             // step 1: load reference sequences
+            System.out.println("Loading reference sequences. . .");
             Map<String, List<ViralSequence>> database = loadDatabase();
 
             // step 2: load unknown sequence to classify
