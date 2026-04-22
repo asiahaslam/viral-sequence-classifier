@@ -101,7 +101,6 @@ public class ViralClassifier {
 
             double bestScore = calculateBestScoreForFamily(unknownSequence, references);
             familyScores.put(familyName, bestScore);
-
         }
         return familyScores;
     }
@@ -116,6 +115,7 @@ public class ViralClassifier {
                                                List<ViralSequence> referenceSequences) {
         // variable to hold the current best score in the family
         double bestScore = 0.0;
+
         // find the number of sequences to check
         int sequencesToCheck = referenceSequences.size();
 
@@ -136,7 +136,15 @@ public class ViralClassifier {
                 );
 
                 double normalizedScore = result.getNormalizedScore();
-                bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
+
+                if (normalizedScore > bestScore) {
+                    bestScore = normalizedScore;
+                    topAlignment = result;
+                    System.out.println(result.getReferenceSequenceName() + ": " + result.getNormalizedScore());
+                    System.out.println(bestScore);
+                }
+
+                // bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
                 totalMemoryUsed += result.getMemoryUsedBytes();
                 // for logging memory use
                 // System.out.println("Memory (bytes) used for classifying " + reference.getVirusFamily() + " with " + aligner.getAlgorithmName() + " number " + (i + 1) + ": " + result.getMemoryUsedBytes());
@@ -149,7 +157,7 @@ public class ViralClassifier {
                 );
             }
         }
-        topAlignment = result;
+        // topAlignment = result;
         return bestScore;
     }
 
