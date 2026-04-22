@@ -11,7 +11,6 @@ public class AlignmentResult {
     private final int startPos2;
     private final int endPos1;
     private final int endPos2;
-    private final int alignmentLength;
     private final long memoryUsedBytes;
 
     // constructor
@@ -24,7 +23,6 @@ public class AlignmentResult {
         this.startPos2 = startPs2;
         this.endPos1 = endPs1;
         this.endPos2 = endPs2;
-        this.alignmentLength = alignedSequence1.length();
         this.memoryUsedBytes = memoryUsedBytes;
     }
 
