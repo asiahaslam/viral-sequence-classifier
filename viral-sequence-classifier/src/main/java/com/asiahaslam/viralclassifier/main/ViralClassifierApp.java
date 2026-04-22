@@ -90,7 +90,7 @@ public class ViralClassifierApp {
         System.out.println("This prediction is " + (result.isPredictionConfident() ? "" : " not") + "confident");
         if (args.shouldShowMaxScore()) {
             System.out.println("\n--Max score--");
-            // call here
+            result.printMaxScore();
         }
         if (args.shouldShowSecondFamily()) {
             System.out.println("\n--Second-best viral family--");
@@ -99,7 +99,8 @@ public class ViralClassifierApp {
         }
         if (args.shouldShowAlignedSequences()) {
             if (aligner.getAlgorithmName().equals("Standard Smith-Waterman")) {
-                // call here
+                System.out.println("\n--Top alignment--");
+                result.printAlignmentInfo();
             }
             else {
                 System.out.println("Cannot recreate optimal alignment for " + aligner.getAlgorithmName());
@@ -125,10 +126,10 @@ public class ViralClassifierApp {
                 new SpaceOptimizedAligner(), database, args.getConfidenceThreshold());
 
         // create list of classifiers
-        List<ViralClassifier> classifiers = new ArrayList<>();
+        /*List<ViralClassifier> classifiers = new ArrayList<>();
         classifiers.add(smithWatermanClassifier);
         classifiers.add(bandedClassifier);
-        classifiers.add(spaceOptimizedClassifier);
+        classifiers.add(spaceOptimizedClassifier);*/
 
         // run classification
         ClassificationResult smithWatermanResults = smithWatermanClassifier.classify(unknownSequence);
@@ -150,8 +151,9 @@ public class ViralClassifierApp {
 
         if (args.shouldShowMaxScore()) {
             System.out.println("\n--Max scores--");
-            for (ViralClassifier classifier : classifiers) {
-                System.out.println(classifier.getAligner().getAlgorithmName() + ": "); // add call
+            for (ClassificationResult result : results) {
+                System.out.println(result.getAlgorithmUsed() + ": ");
+                result.printMaxScore();
             }
         }
         if (args.shouldShowSecondFamily()) {
@@ -170,7 +172,7 @@ public class ViralClassifierApp {
         }
         if (args.shouldShowAlignedSequences()) {
             System.out.println("\n--Standard Smith-Waterman sequence alignment information--");
-            // call here
+            smithWatermanResults.printAlignmentInfo();
         }
     }
 

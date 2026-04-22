@@ -15,7 +15,6 @@ public class ViralClassifier {
     private final Map<String, List<ViralSequence>> referenceDatabase;
     private final double confidenceThreshold;
     private long totalMemoryUsed;
-    private AlignmentResult topAlignment;
 
     // constructor with default parameters
     public ViralClassifier(Map<String, List<ViralSequence>> referenceDatabase) {
@@ -23,7 +22,6 @@ public class ViralClassifier {
         this.referenceDatabase = new HashMap<>(referenceDatabase);
         this.confidenceThreshold = 0.70; // default is 70% similarity
         this.totalMemoryUsed = 0;
-        this.topAlignment = new AlignmentResult(0.0, 0.0);
     }
 
     /**
@@ -38,7 +36,24 @@ public class ViralClassifier {
         this.referenceDatabase = referenceDatabase;
         this.confidenceThreshold = confidenceThreshold;
         this.totalMemoryUsed = 0;
-        this.topAlignment = new AlignmentResult(0.0, 0.0);
+    }
+
+    // track the best sequence alignment
+    private static class BestAlignmentTracker {
+        AlignmentResult bestAlignment = null;
+        String bestReferenceId = null;
+        double bestNormalizedScore = 0.0;
+        double bestRawScore = 0.0;
+
+        void updateIfBetter(AlignmentResult result, String referenceName) {
+            double normalizedScore = result.getNormalizedScore();
+            if (normalizedScore > bestNormalizedScore) {
+                bestNormalizedScore = normalizedScore;
+                bestRawScore = result.getAlignmentScore();
+                bestAlignment = result;
+                bestReferenceId = referenceName;
+            }
+        }
     }
 
     /**
@@ -48,6 +63,8 @@ public class ViralClassifier {
      */
     public ClassificationResult classify(ViralSequence unknownSequence) {
         long startTime = System.currentTimeMillis(); // for calculating processing time
+        // Map<String, Double> familyScores = new HashMap<>();
+        BestAlignmentTracker globalTracker = new BestAlignmentTracker();
 
         // validate input
         // if no sequence, use createUnknown to create an unknown viral sequence
@@ -62,7 +79,7 @@ public class ViralClassifier {
         }
 
         // calculate alignment scores against each virus family
-        Map<String, Double> familyScores = calculateFamilyScores(unknownSequence);
+        Map<String, Double> familyScores = calculateFamilyScores(unknownSequence, globalTracker);
 
         // determine best classification
         String bestFamily = findBestFamily(familyScores);
@@ -83,7 +100,10 @@ public class ViralClassifier {
                 familyScores,
                 aligner.getAlgorithmName(),
                 processingTime,
-                totalMemoryUsed
+                totalMemoryUsed,
+                globalTracker.bestAlignment,
+                globalTracker.bestReferenceId,
+                globalTracker.bestRawScore
         );
     }
 
@@ -92,14 +112,14 @@ public class ViralClassifier {
      * @param unknownSequence the unclassified sequence
      * @return Map<String, Double> familyScores the map of alignment scores for each sequence in the family
      */
-    private Map<String, Double> calculateFamilyScores(ViralSequence unknownSequence) {
+    private Map<String, Double> calculateFamilyScores(ViralSequence unknownSequence, BestAlignmentTracker globalTracker) {
         Map<String, Double> familyScores = new HashMap<>();
 
         for (Map.Entry<String, List<ViralSequence>> familyEntry : referenceDatabase.entrySet()) {
             String familyName = familyEntry.getKey();
             List<ViralSequence> references = familyEntry.getValue();
 
-            double bestScore = calculateBestScoreForFamily(unknownSequence, references);
+            double bestScore = calculateBestScoreForFamily(unknownSequence, references, globalTracker);
             familyScores.put(familyName, bestScore);
         }
         return familyScores;
@@ -112,7 +132,7 @@ public class ViralClassifier {
      * @return double the best normalized score for a virus family
      */
     private double calculateBestScoreForFamily(ViralSequence unknownSequence,
-                                               List<ViralSequence> referenceSequences) {
+                                               List<ViralSequence> referenceSequences, BestAlignmentTracker globalTracker) {
         // variable to hold the current best score in the family
         double bestScore = 0.0;
 
@@ -135,18 +155,14 @@ public class ViralClassifier {
                         reference.getSequence()
                 );
 
+                // update global best tracker
+                globalTracker.updateIfBetter(result, reference.getName());
+
                 double normalizedScore = result.getNormalizedScore();
+                bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
 
-                if (normalizedScore > bestScore) {
-                    bestScore = normalizedScore;
-                    topAlignment = result;
-                    System.out.println(result.getReferenceSequenceName() + ": " + result.getNormalizedScore());
-                    System.out.println(bestScore);
-                }
-
-                // bestScore = Math.max(bestScore, normalizedScore); // see if the current alignment is the best so far
                 totalMemoryUsed += result.getMemoryUsedBytes();
-                // for logging memory use
+                // for logging memory use for each alignment
                 // System.out.println("Memory (bytes) used for classifying " + reference.getVirusFamily() + " with " + aligner.getAlgorithmName() + " number " + (i + 1) + ": " + result.getMemoryUsedBytes());
             }
 
@@ -157,7 +173,6 @@ public class ViralClassifier {
                 );
             }
         }
-        // topAlignment = result;
         return bestScore;
     }
 
@@ -173,7 +188,6 @@ public class ViralClassifier {
     // getters
     public double getConfidenceThreshold() { return confidenceThreshold; }
     public SequenceAligner getAligner() { return aligner; }
-    public AlignmentResult getTopAlignment() { return topAlignment; }
 }
 
 

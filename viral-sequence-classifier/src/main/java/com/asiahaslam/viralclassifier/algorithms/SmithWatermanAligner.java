@@ -59,9 +59,9 @@ public class SmithWatermanAligner extends SequenceAligner {
         // store results to capture from lambda
         final AlignmentResultData resultData = new AlignmentResultData();
 
-        /*// test the memory measurement itself
+        /*// for debugging: test the memory measurement
         long testMemory = AccurateMemoryMeasurement.measureAllocatedMemory(() -> {
-            // Allocate something we know the size of
+            // something we know the size of
             double[] testArray = new double[1000]; // Should be 8000 bytes
             for (int i = 0; i < testArray.length; i++) {
                 testArray[i] = i; // Force actual allocation

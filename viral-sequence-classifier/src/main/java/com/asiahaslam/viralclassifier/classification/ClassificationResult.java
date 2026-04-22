@@ -49,7 +49,7 @@ public class ClassificationResult {
     public static ClassificationResult createUnknown(String sequenceId, Map<String, Double> allFamilyScores,
                                               String algorithmUsed, long processingTimeMs, long memoryUsedBytes) {
         return new ClassificationResult(sequenceId, "Unknown", 0.0, false,
-                allFamilyScores, algorithmUsed, processingTimeMs, memoryUsedBytes, new AlignmentResult(0.0, 0.0), "", 0.0);
+                allFamilyScores, algorithmUsed, processingTimeMs, memoryUsedBytes, null, "", 0.0);
     }
 
     public static class SecondBestFamily {
@@ -116,15 +116,17 @@ public class ClassificationResult {
     public boolean isPredictionConfident() {
         return isPredictionConfident;
     }
-    public AlignmentResult getTopAlignment() { return topAlignment; }
+    /*public AlignmentResult getTopAlignment() { return topAlignment; }
     public String getTopReferenceName() { return topReferenceName; }
-    public double getTopRawScore() { return topRawScore; }
+    public double getTopRawScore() { return topRawScore; }*/
 
     // print max score details
     public void printMaxScore() {
-        if (topAlignment != null && !topAlignment.getAlignedSequence1().isEmpty() && !topAlignment.getAlignedSequence2().isEmpty()) {
-            System.out.printf("Score: %.2f (normalized: %.3f)", topRawScore, confidence);
-            System.out.println(" Reference sequence name: " + topReferenceName);
+        if (topRawScore != 0.0 && confidence != 0.0) {
+            System.out.printf("Score: %.2f (normalized: %.3f), ", topRawScore, confidence);
+        }
+        if (!topReferenceName.isEmpty()) {
+            System.out.println("Reference sequence name: " + topReferenceName);
         }
     }
 
