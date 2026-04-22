@@ -230,6 +230,7 @@ public class CommandLineParser {
                         System.err.println("Error: -c/--confidence requires a number");
                         showHelp = true;
                         break;
+
                     }
                     try {
                         confidenceThreshold = Double.parseDouble(args[++i]);
