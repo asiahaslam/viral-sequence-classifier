@@ -30,13 +30,8 @@ public class AlignmentResult {
 
     // basic constructor for development purposes (uses only scores)
     public AlignmentResult(double alignmentScr, double normalizedScr) {
-        this(alignmentScr, normalizedScr, "", "", 0, 0, 0, 0, 0);
+        this(alignmentScr, normalizedScr, "", "", 0, 0, 0, 0, 0L);
     }
-
-    //
-    /*public String getFormattedAlignment() {
-        return String.format("Score: %.2f (normalized: %.3f)", alignmentScore, normalizedScore);
-    }*/
 
     // getters
     public double getAlignmentScore() { return alignmentScore; }
@@ -47,6 +42,5 @@ public class AlignmentResult {
     public int getStartPos2() { return startPos2; }
     public int getEndPos1() { return endPos1; }
     public int getEndPos2() { return endPos2; }
-    public int getAlignmentLength() { return alignmentLength; }
     public long getMemoryUsedBytes() { return memoryUsedBytes; }
 }
