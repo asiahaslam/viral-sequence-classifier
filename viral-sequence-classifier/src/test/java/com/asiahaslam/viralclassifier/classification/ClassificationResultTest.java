@@ -19,7 +19,8 @@ public class ClassificationResultTest {
     @Test
     void testBasicCreation() {
         ClassificationResult result = new ClassificationResult(
-                "test1", "Influenza", 0.85, true, familyScores, "TestAlg", 100L, 1024L
+                "test1", "Influenza", 0.85, true, familyScores,
+                "TestAlg", 100L, 1024L, null, "", 0.0
         );
 
         assertEquals("test1", result.getSequenceId());
@@ -34,7 +35,8 @@ public class ClassificationResultTest {
     @Test
     void testSecondBestFamily() {
         ClassificationResult result = new ClassificationResult(
-                "test2", "Influenza", 0.85, true, familyScores, "TestAlg", 100L, 1024L
+                "test2", "Influenza", 0.85, true, familyScores,
+                "TestAlg", 100L, 1024L, null, "", 0.0
         );
 
         assertEquals("Coronavirus", result.getSecondBestFamily().getSecondBest());
@@ -43,7 +45,8 @@ public class ClassificationResultTest {
     @Test
     void testMemoryConversion() {
         ClassificationResult result = new ClassificationResult(
-                "test2", "Influenza", 0.85, true, familyScores, "TestAlg", 100L, 2048L
+                "test2", "Influenza", 0.85, true, familyScores,
+                "TestAlg", 100L, 2048L, null, "", 0.0
         );
 
         assertEquals(2.0, result.getMemoryUsedKB());
