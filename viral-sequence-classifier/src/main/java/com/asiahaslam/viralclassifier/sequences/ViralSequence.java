@@ -44,6 +44,4 @@ public class ViralSequence {
     public int getLength() {
         return sequence.length();
     }
-
-    // TODO: maybe override toString method for this class
 }
